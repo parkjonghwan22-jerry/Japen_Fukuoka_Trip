@@ -121,3 +121,9 @@ test('더 새 버전의 데이터는 덮어쓰지 않는다', () => {
   store.update((d) => { d.ui.tab = 'expense'; });
   assert.equal(storage.getItem(STORAGE_KEY), newer);
 });
+
+test('지도 필터 기본값은 전체, 옛 데이터에도 채워진다', () => {
+  assert.equal(createStore(memoryStorage()).get().ui.mapFilter, 'all');
+  const old = JSON.stringify({ version: 1, ui: { tab: 'map' } });
+  assert.equal(createStore(memoryStorage({ [STORAGE_KEY]: old })).get().ui.mapFilter, 'all');
+});

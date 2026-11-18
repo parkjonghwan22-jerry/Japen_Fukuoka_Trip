@@ -37,7 +37,11 @@ function showBanner() {
   if (text) banner.textContent = text;
 }
 
+let current = null;
+
 function render(tab) {
+  if (current && current !== tab) MODULES[current].unmount?.();
+  current = tab;
   for (const b of buttons) {
     if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page');
     else b.removeAttribute('aria-current');

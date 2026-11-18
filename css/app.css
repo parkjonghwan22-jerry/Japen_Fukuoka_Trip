@@ -199,3 +199,85 @@ button { font-family: inherit; }
 @media (prefers-reduced-motion: reduce) {
   #splash { transition: none; }
 }
+
+/* ---------- 지도 ---------- */
+#view { position: relative; }
+.map-page {
+  position: absolute;
+  inset: 0 0 calc(var(--tabbar-h) + var(--safe-bottom)) 0;
+}
+.map { position: absolute; inset: 0; background: #eef0f3; font-family: var(--font); }
+
+.map-top {
+  position: absolute;
+  top: calc(10px + var(--safe-top));
+  left: 0; right: 0;
+  z-index: 500;
+  pointer-events: none;
+}
+.chips {
+  display: flex;
+  gap: 8px;
+  padding: 2px 12px 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  pointer-events: auto;
+}
+.chips::-webkit-scrollbar { display: none; }
+.chip {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--text-2);
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(25, 31, 40, 0.18);
+  cursor: pointer;
+}
+.chip[aria-selected="true"] { background: var(--text); color: #fff; }
+
+.map-note {
+  display: inline-block;
+  margin: 4px 12px 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--text-2);
+  font-size: 13px;
+  box-shadow: 0 1px 3px rgba(25, 31, 40, 0.12);
+}
+
+.mk-wrap { background: none; border: 0; }
+.mk-dim { opacity: 0.5; }
+.mk-num, .mk-stay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 2.5px solid #fff;
+  color: #fff;
+  font: 700 14px/1 var(--font);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+.mk-num { border-radius: 50%; }
+.mk-stay { border-radius: 9px; font-size: 13px; }
+.mk-dot {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border: 2.5px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.leaflet-popup-content-wrapper { border-radius: 12px; }
+.leaflet-popup-content { margin: 10px 14px; font-family: var(--font); }
+.pop strong { display: block; font-size: 16px; color: var(--text); }
+.pop span { display: block; margin-top: 2px; font-size: 14px; color: var(--muted); }
+.leaflet-control-attribution { font-size: 10px; }
+/* 지도 바탕색을 차분하게 눌러 마커가 잘 보이도록 */
+.leaflet-tile-pane { filter: saturate(0.45) brightness(1.04) contrast(0.95); }

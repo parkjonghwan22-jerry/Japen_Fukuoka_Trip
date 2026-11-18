@@ -22,7 +22,7 @@ export function defaultState() {
     checklist: [],
     transit: [],
     expenses: [],
-    ui: { tab: 'home' },
+    ui: { tab: 'home', mapFilter: 'all' },
   };
 }
 
