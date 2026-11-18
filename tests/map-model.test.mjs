@@ -74,3 +74,13 @@ test('예시 장소: 모든 일차에 경로가 있고 좌표가 후쿠오카 �
     assert.ok(p.lat > 33.4 && p.lat < 33.7 && p.lng > 130.2 && p.lng < 130.6, p.name);
   }
 });
+
+test('좌표 (0,0)은 입력 누락으로 보고 제외', () => {
+  assert.equal(hasCoords({ lat: 0, lng: 0 }), false);
+});
+
+test('일차가 없거나 잘못된 plan은 후보와 함께 보인다', () => {
+  const places = [plan('a', null, 1), plan('b', 'd9', 1), cand('k')];
+  assert.deepEqual(visibleLayers(places, 'candidates').candidates.map((p) => p.id), ['a', 'b', 'k']);
+  assert.deepEqual(visibleLayers(places, 'all').candidates.map((p) => p.id), ['a', 'b', 'k']);
+});

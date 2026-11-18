@@ -188,6 +188,11 @@ button { font-family: inherit; }
   z-index: 2000;
   background: #111;
   transition: opacity 0.45s ease;
+  /* splash.js가 실행되지 못해도 4초 뒤 스스로 사라져 앱을 가리지 않는다 */
+  animation: splash-auto-hide 0.45s ease 4s forwards;
+}
+@keyframes splash-auto-hide {
+  to { opacity: 0; visibility: hidden; pointer-events: none; }
 }
 #splash img {
   width: 100%;

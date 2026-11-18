@@ -86,6 +86,14 @@ function draw(layerGroup, places, filter, days, isSample) {
 
 export function mount(el, store) {
   unmount();
+  if (typeof L === 'undefined') {
+    el.innerHTML = `
+      <section class="page">
+        <h1>지도</h1>
+        <p class="placeholder">지도를 불러오지 못했어요. 인터넷에 연결한 뒤 앱을 다시 열어주세요.</p>
+      </section>`;
+    return;
+  }
   const state = store.get();
   const days = state.trip.days;
   const labels = filterLabels(days);

@@ -9,7 +9,9 @@ const DAY_IDS = Object.keys(DAY_COLORS);
 const isNum = (v) => typeof v === 'number' && Number.isFinite(v);
 
 export function hasCoords(p) {
-  return !!p && isNum(p.lat) && isNum(p.lng) && Math.abs(p.lat) <= 90 && Math.abs(p.lng) <= 180;
+  if (!p || !isNum(p.lat) || !isNum(p.lng)) return false;
+  if (p.lat === 0 && p.lng === 0) return false; // 빈 입력이 0으로 바뀐 경우
+  return Math.abs(p.lat) <= 90 && Math.abs(p.lng) <= 180;
 }
 
 export function routeForDay(places, dayId) {
@@ -23,7 +25,9 @@ const staysOn = (dayId) => (p) =>
 
 export function visibleLayers(places, filter) {
   const f = MAP_FILTERS.includes(filter) ? filter : 'all';
-  const candidates = places.filter((p) => p.kind === 'candidate' && hasCoords(p));
+  // 일차가 정해지지 않은 일정 장소도 사라지지 않도록 후보와 함께 보여준다
+  const noDay = (p) => p.kind === 'plan' && !DAY_IDS.includes(p.dayId);
+  const candidates = places.filter((p) => (p.kind === 'candidate' || noDay(p)) && hasCoords(p));
   const allStays = places.filter((p) => p.kind === 'stay' && hasCoords(p));
   const route = (dayId) => ({ dayId, color: DAY_COLORS[dayId], places: routeForDay(places, dayId) });
 
