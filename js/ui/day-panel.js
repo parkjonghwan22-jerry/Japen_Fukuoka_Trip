@@ -18,6 +18,7 @@ export function createDayPanel(container, { onSelect, onMove, onAddToDay }) {
       </div>
     </div>
     <div class="panel-tools" hidden>
+      <span class="panel-tools-note" hidden>예시 장소는 순서를 바꿀 수 없어요. 장소를 직접 추가하면 순서 바꾸기를 쓸 수 있어요.</span>
       <button type="button" class="panel-edit">순서 바꾸기</button>
     </div>
     <div class="panel-body"></div>`;
@@ -107,7 +108,10 @@ export function createDayPanel(container, { onSelect, onMove, onAddToDay }) {
     const { places, days, filter, isSample } = last;
     const isDay = filter.startsWith('d');
     if (!isDay) editing = false;
-    tools.hidden = !isDay || isSample;
+    // 날짜를 고르면 버튼 줄은 항상 보인다. 예시 장소일 땐 버튼 대신 이유를 보여준다.
+    tools.hidden = !isDay;
+    editBtn.hidden = isSample;
+    tools.querySelector('.panel-tools-note').hidden = !isSample;
     editBtn.textContent = editing ? '완료' : '순서 바꾸기';
     editBtn.classList.toggle('on', editing);
 
@@ -131,7 +135,7 @@ export function createDayPanel(container, { onSelect, onMove, onAddToDay }) {
     const total = sections.reduce((n, s) => n + s.items.length, 0);
     title.textContent = filter === 'all' ? `전체 일정 · ${total}곳` : `${sections[0].label} · ${total}곳`;
 
-    const tip = filter === 'all' && !isSample && total > 1
+    const tip = filter === 'all'
       ? '<p class="panel-tip">순서를 바꾸려면 위에서 날짜(예: 12/31)를 먼저 고른 뒤 <b>순서 바꾸기</b>를 누르세요.</p>' : '';
     body.innerHTML = tip + sections.map((s) => {
       const warn = timeWarnings(s.items);
