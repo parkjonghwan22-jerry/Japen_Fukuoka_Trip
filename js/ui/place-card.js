@@ -3,7 +3,7 @@ import { openSheet, closeSheet } from './sheet.js';
 import { KIND_LABELS, NEW_YEAR_LABELS, directionsUrl } from '../places.js';
 
 // 장소 카드. onEdit(place), onDelete(place)
-export function openPlaceCard(place, { days, onEdit, onDelete }) {
+export function openPlaceCard(place, { days, onEdit, onDelete, onShowOnMap }) {
   const day = days.find((d) => d.id === place.dayId);
   const stayDays = place.kind === 'stay'
     ? (place.stayDayIds?.length ? place.stayDayIds.map((id) => days.find((d) => d.id === id)?.label).filter(Boolean).join(', ') : '전 일정')
@@ -30,6 +30,7 @@ export function openPlaceCard(place, { days, onEdit, onDelete }) {
       ${rows.length ? `<dl class="card-rows">${rows.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : ''}
       <div class="card-actions">
         <a class="btn btn-primary" href="${esc(directionsUrl(place))}" target="_blank" rel="noopener">구글맵 길찾기</a>
+        ${onShowOnMap ? '<button type="button" class="btn" data-act="map">지도에서 보기</button>' : ''}
         <button type="button" class="btn" data-act="edit">수정</button>
         <button type="button" class="btn btn-danger-text" data-act="delete">삭제</button>
       </div>
@@ -43,6 +44,7 @@ export function openPlaceCard(place, { days, onEdit, onDelete }) {
     </div>`;
 
   const confirmBox = el.querySelector('.card-confirm');
+  el.querySelector('[data-act="map"]')?.addEventListener('click', () => { closeSheet(); onShowOnMap(place); });
   el.querySelector('[data-act="edit"]').addEventListener('click', () => onEdit(place));
   el.querySelector('[data-act="delete"]').addEventListener('click', () => { confirmBox.hidden = false; });
   el.querySelector('[data-act="cancel"]').addEventListener('click', () => { confirmBox.hidden = true; });

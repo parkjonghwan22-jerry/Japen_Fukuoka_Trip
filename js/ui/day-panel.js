@@ -131,7 +131,9 @@ export function createDayPanel(container, { onSelect, onMove, onAddToDay }) {
     const total = sections.reduce((n, s) => n + s.items.length, 0);
     title.textContent = filter === 'all' ? `전체 일정 · ${total}곳` : `${sections[0].label} · ${total}곳`;
 
-    body.innerHTML = sections.map((s) => {
+    const tip = filter === 'all' && !isSample && total > 1
+      ? '<p class="panel-tip">순서를 바꾸려면 위에서 날짜(예: 12/31)를 먼저 고른 뒤 <b>순서 바꾸기</b>를 누르세요.</p>' : '';
+    body.innerHTML = tip + sections.map((s) => {
       const warn = timeWarnings(s.items);
       const list = s.items.map((p, i) => row(p, String(i + 1), s.color, {
         warn: warn.has(p.id),

@@ -143,7 +143,8 @@ export function mount(el, store) {
   const chips = [...el.querySelectorAll('.chip')];
 
   const panel = createDayPanel(el.querySelector('.map-page'), {
-    onSelect: (p) => focusPlace(p),
+    // 목록 항목을 눌러도 지도는 움직이지 않는다. 카드만 열고, 이동은 카드의 '지도에서 보기'로.
+    onSelect: (p) => (store.get().places.length ? openCard(p, { fromList: true }) : focusPlace(p)),
     onMove: (id, dir) => {
       store.update((d) => { d.places = moveInDay(d.places, id, dir); });
       render({ fit: false });
@@ -157,14 +158,13 @@ export function mount(el, store) {
   // ＋ 버튼은 패널 위에 오도록 패널 뒤에 둔다
   panel.element.after(el.querySelector('.fab'));
 
-  // 장소로 이동: 패널을 접고, 장소가 화면 위쪽(카드에 가리지 않게)에 오도록 맞춘 뒤 카드 열기
+  // 장소로 이동: 패널을 접고 장소를 화면 위쪽에 맞춘다
   function focusPlace(p) {
     panel.collapse();
     const zoom = Math.max(map.getZoom(), 16);
     const h = map.getSize().y;
     const point = map.project([p.lat, p.lng], zoom).add([0, h * 0.22]);
     map.flyTo(map.unproject(point, zoom), zoom, { duration: 0.6 });
-    if (store.get().places.length) setTimeout(() => openCard(p), 350);
   }
 
   function render({ fit = true } = {}) {
@@ -201,8 +201,9 @@ export function mount(el, store) {
     openPlaceForm(initial, { days, onSave: save });
   }
 
-  function openCard(place) {
+  function openCard(place, { fromList = false } = {}) {
     openPlaceCard(place, {
+      onShowOnMap: fromList ? (p) => focusPlace(p) : undefined,
       days,
       onEdit: (p) => openForm(p),
       onDelete: (p) => {

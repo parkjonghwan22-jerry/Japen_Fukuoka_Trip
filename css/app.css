@@ -377,7 +377,7 @@ button { font-family: inherit; }
 .card-rows dd { flex: 1; margin: 0; font-size: 16px; white-space: pre-wrap; word-break: break-word; }
 .card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .card-actions .btn-primary { flex: 1 1 100%; }
-.card-actions .btn:not(.btn-primary) { flex: 1; }
+.card-actions .btn:not(.btn-primary) { flex: 1; padding: 0 10px; white-space: nowrap; }
 .card-confirm { margin-top: 16px; padding: 14px 16px; border-radius: 14px; background: #fff5f5; }
 .card-confirm p { margin: 0 0 12px; font-weight: 600; }
 
@@ -515,3 +515,4 @@ button { font-family: inherit; }
 }
 .map-page .leaflet-bottom { bottom: 76px; } /* 출처 표기를 접힌 패널 위로 */
 .map-page:has(.panel[data-state="expanded"]) .leaflet-bottom { bottom: 60%; } /* 펼친 패널 위로 — 출처 표기는 항상 보이게 */
+.panel-tip { margin: 0 8px 8px; padding: 10px 12px; border-radius: 12px; background: var(--subtle); color: var(--text-2); font-size: 14px; }
