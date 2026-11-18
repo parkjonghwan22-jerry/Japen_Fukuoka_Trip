@@ -33,6 +33,20 @@ export function newId(prefix) {
 
 const isObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 
+// id가 없거나 겹치는 항목에 새 id를 붙인다 (처음 나온 id는 유지)
+function uniqueIds(list, prefix) {
+  const seen = new Set();
+  return list.map((item) => {
+    let id = typeof item.id === 'string' && item.id ? item.id : null;
+    if (!id || seen.has(id)) {
+      do { id = newId(prefix); } while (seen.has(id));
+      item = { ...item, id };
+    }
+    seen.add(id);
+    return item;
+  });
+}
+
 // 저장된 데이터를 현재 스키마로 맞춘다. 버전이 올라가면 여기에 단계별 변환을 추가한다.
 function migrate(data) {
   const base = defaultState();
@@ -40,6 +54,7 @@ function migrate(data) {
   for (const key of ['people', 'places', 'checklist', 'transit', 'expenses']) {
     if (!Array.isArray(out[key])) out[key] = [];
   }
+  out.places = uniqueIds(out.places.filter(isObject), 'p');
   out.trip = isObject(data.trip) ? { ...base.trip, ...data.trip } : base.trip;
   if (!Array.isArray(out.trip.days) || out.trip.days.length === 0) out.trip.days = base.trip.days;
   out.ui = isObject(data.ui) ? { ...base.ui, ...data.ui } : base.ui;

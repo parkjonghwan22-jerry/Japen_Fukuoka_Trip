@@ -33,6 +33,7 @@ export function openSheet(content, { title = '', onClose } = {}) {
     history.pushState({ sheet: true }, '');
     requestAnimationFrame(() => root.classList.add('sheet-open'));
   }
+  else current.onClose?.(); // 내용을 바꿔 끼우면 이전 내용의 정리 작업 실행
   current.onClose = onClose;
   current.root.querySelector('.sheet-title').textContent = title;
   current.body.replaceChildren(content);

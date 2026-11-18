@@ -100,8 +100,10 @@ export function openPlaceForm(initial, { days, onSave }) {
   syncKind();
 
   form.querySelector('[data-act="cancel"]').addEventListener('click', closeSheet);
+  let submitted = false; // 두 번 눌러 중복 저장되는 것 방지
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+    if (submitted) return;
     const f = form.elements;
     const input = {
       ...p,
@@ -122,6 +124,7 @@ export function openPlaceForm(initial, { days, onSave }) {
       form.querySelector('.field-error:not(:empty)')?.scrollIntoView({ block: 'center', behavior: 'smooth' });
       return;
     }
+    submitted = true;
     onSave(r.place);
     closeSheet();
   });

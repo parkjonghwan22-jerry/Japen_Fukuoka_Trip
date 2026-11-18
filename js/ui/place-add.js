@@ -1,5 +1,5 @@
 import { esc, html, toast } from './dom.js';
-import { openSheet, closeSheet } from './sheet.js';
+import { openSheet, closeSheet, isSheetOpen } from './sheet.js';
 import { searchPlaces } from '../geocode.js';
 
 // ＋ 버튼: 추가 방법 고르기. onPick({ lat, lng, name?, address? })
@@ -24,8 +24,11 @@ function addHere(onPick) {
   }
   toast('현재 위치를 확인하는 중…');
   navigator.geolocation.getCurrentPosition(
-    (pos) => onPick({ lat: pos.coords.latitude, lng: pos.coords.longitude, address: '현재 위치' }),
-    (err) => toast(err.code === err.PERMISSION_DENIED
+    (pos) => {
+      if (!isSheetOpen()) return; // 기다리는 동안 창을 닫았으면 무시
+      onPick({ lat: pos.coords.latitude, lng: pos.coords.longitude, address: '현재 위치' });
+    },
+    (err) => isSheetOpen() && toast(err.code === err.PERMISSION_DENIED
       ? '위치 권한이 꺼져 있어요. 브라우저 설정에서 허용해주세요'
       : '현재 위치를 찾지 못했어요. 잠시 후 다시 시도해주세요'),
     { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 },
@@ -71,7 +74,7 @@ function openSearch(onPick) {
 
   input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(run, 600); });
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { clearTimeout(timer); run(); } });
-  openSheet(el, { title: '이름으로 검색', onClose: () => controller?.abort() });
+  openSheet(el, { title: '이름으로 검색', onClose: () => { clearTimeout(timer); controller?.abort(); } });
   setTimeout(() => input.focus(), 300);
 }
 

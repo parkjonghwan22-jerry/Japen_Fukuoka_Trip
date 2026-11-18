@@ -105,3 +105,14 @@ test('길찾기 링크: 좌표 목적지, 대중교통', () => {
     'https://www.google.com/maps/dir/?api=1&destination=33.5897,130.4207&travelmode=transit',
   );
 });
+
+test('일차 순서에 빈틈이 있어도 새 장소는 가장 큰 순서 + 1', () => {
+  const places = [P('a', 'd2', 1), P('b', 'd2', 3)];
+  const next = savePlace(places, ok({ ...base, dayId: 'd2' }));
+  assert.equal(next.find((p) => !['a', 'b'].includes(p.id)).order, 4);
+});
+
+test('id 없는 장소 삭제 요청은 아무것도 지우지 않는다', () => {
+  const places = [{ ...P('a', 'd1', 1), id: undefined }, { ...P('b', 'd1', 2), id: undefined }];
+  assert.equal(deletePlace(places, undefined).length, 2);
+});

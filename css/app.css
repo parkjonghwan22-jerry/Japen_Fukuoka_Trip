@@ -328,6 +328,7 @@ button { font-family: inherit; }
 
 /* ---------- 하단 시트 ---------- */
 .sheet-root { position: fixed; inset: 0; z-index: 1500; }
+.sheet-root:not(.sheet-open) { pointer-events: none; } /* 닫히는 중엔 눌리지 않게 */
 .sheet-backdrop {
   position: absolute; inset: 0;
   background: rgba(17, 17, 17, 0.4);

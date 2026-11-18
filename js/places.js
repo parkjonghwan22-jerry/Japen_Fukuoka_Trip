@@ -62,14 +62,16 @@ export function validatePlace(input) {
 // 일차 안 순서를 1,2,3…으로 다시 매긴다 (기존 순서 유지)
 function renumber(places, dayId) {
   const ids = places
-    .filter((p) => p.kind === 'plan' && p.dayId === dayId)
+    .filter((p) => p.kind === 'plan' && p.dayId === dayId && p.id)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
     .map((p) => p.id);
   return places.map((p) => (ids.includes(p.id) ? { ...p, order: ids.indexOf(p.id) + 1 } : p));
 }
 
-const lastOrder = (places, dayId) =>
-  places.filter((p) => p.kind === 'plan' && p.dayId === dayId).length;
+// 빈틈·중복이 있는 데이터에서도 겹치지 않도록 가장 큰 순서를 기준으로 한다
+const lastOrder = (places, dayId) => places
+  .filter((p) => p.kind === 'plan' && p.dayId === dayId)
+  .reduce((max, p) => Math.max(max, Number.isFinite(p.order) ? p.order : 0), 0);
 
 export function savePlace(places, place) {
   const prev = place.id ? places.find((p) => p.id === place.id) : null;
@@ -89,6 +91,7 @@ export function savePlace(places, place) {
 }
 
 export function deletePlace(places, id) {
+  if (!id) return places;
   const target = places.find((p) => p.id === id);
   const next = places.filter((p) => p.id !== id);
   return target && target.kind === 'plan' ? renumber(next, target.dayId) : next;

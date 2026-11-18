@@ -127,3 +127,21 @@ test('지도 필터 기본값은 전체, 옛 데이터에도 채워진다', () =
   const old = JSON.stringify({ version: 1, ui: { tab: 'map' } });
   assert.equal(createStore(memoryStorage({ [STORAGE_KEY]: old })).get().ui.mapFilter, 'all');
 });
+
+test('불러온 장소의 id가 없거나 겹치면 새 id를 붙인다', () => {
+  const raw = JSON.stringify({ version: 1, places: [
+    { id: 'p_1', name: 'A' }, { id: 'p_1', name: 'B' }, { name: 'C' }, { id: '', name: 'D' }, { id: 'p_2', name: 'E' },
+  ] });
+  const places = createStore(memoryStorage({ [STORAGE_KEY]: raw })).get().places;
+  const ids = places.map((p) => p.id);
+  assert.equal(new Set(ids).size, 5);
+  assert.equal(places[0].id, 'p_1');
+  assert.equal(places[4].id, 'p_2');
+  assert.ok(ids.every((id) => typeof id === 'string' && id.length > 0));
+  assert.deepEqual(places.map((p) => p.name), ['A', 'B', 'C', 'D', 'E']);
+});
+
+test('장소 목록에 객체가 아닌 값이 섞여 있으면 버린다', () => {
+  const raw = JSON.stringify({ version: 1, places: [null, 3, 'x', { id: 'p_1', name: 'A' }] });
+  assert.deepEqual(createStore(memoryStorage({ [STORAGE_KEY]: raw })).get().places.map((p) => p.name), ['A']);
+});
