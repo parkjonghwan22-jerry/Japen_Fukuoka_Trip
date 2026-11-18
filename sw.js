@@ -12,6 +12,7 @@ const APP_FILES = [
   "./js/store.js",
   "./js/router.js",
   "./js/photos.js",
+  "./js/map/model.js",
   "./js/tabs/home.js",
   "./js/tabs/map.js",
   "./js/tabs/checklist.js",
