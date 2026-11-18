@@ -78,3 +78,46 @@ test('newId는 접두사와 고유값', () => {
   const ids = new Set(Array.from({ length: 100 }, () => newId('p')));
   assert.equal(ids.size, 100);
 });
+
+test('JSON이지만 객체가 아니면(null, 숫자, 배열) 깨진 데이터로 처리', () => {
+  for (const raw of ['null', '42', '[]']) {
+    const storage = memoryStorage({ [STORAGE_KEY]: raw });
+    const store = createStore(storage);
+    assert.deepEqual(store.get(), defaultState(), raw);
+    assert.equal(store.lastError, 'corrupt-data', raw);
+    const kept = [...storage._data.keys()].filter((k) => k.startsWith('fukuoka-trip:corrupt:'));
+    assert.equal(kept.length, 1, raw);
+  }
+});
+
+test('옛 데이터에 빠진 키는 기본값으로 채운다', () => {
+  const old = { version: 1, places: [{ id: 'p_1', name: '하카타역' }] };
+  const store = createStore(memoryStorage({ [STORAGE_KEY]: JSON.stringify(old) }));
+  const s = store.get();
+  assert.equal(s.places[0].name, '하카타역');
+  assert.equal(s.ui.tab, 'map');
+  assert.deepEqual(s.expenses, []);
+  assert.equal(s.trip.days.length, 4);
+  assert.equal(store.lastError, null);
+  store.update((d) => { d.ui.tab = 'transit'; });
+});
+
+test('깨진 데이터 보존에 실패하면 원래 키를 덮어쓰지 않는다', () => {
+  const storage = memoryStorage({ [STORAGE_KEY]: '{oops' });
+  const realSet = storage.setItem;
+  storage.setItem = (k, v) => { if (k.startsWith('fukuoka-trip:corrupt:')) throw new Error('quota'); realSet(k, v); };
+  const store = createStore(storage);
+  assert.equal(store.lastError, 'corrupt-unsaved');
+  store.update((d) => { d.ui.tab = 'expense'; });
+  assert.equal(store.get().ui.tab, 'expense');
+  assert.equal(storage.getItem(STORAGE_KEY), '{oops');
+});
+
+test('더 새 버전의 데이터는 덮어쓰지 않는다', () => {
+  const newer = JSON.stringify({ ...defaultState(), version: SCHEMA_VERSION + 1 });
+  const storage = memoryStorage({ [STORAGE_KEY]: newer });
+  const store = createStore(storage);
+  assert.equal(store.lastError, 'newer-version');
+  store.update((d) => { d.ui.tab = 'expense'; });
+  assert.equal(storage.getItem(STORAGE_KEY), newer);
+});

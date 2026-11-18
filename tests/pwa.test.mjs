@@ -30,3 +30,13 @@ test('서비스 워커가 미리 캐시하는 파일이 모두 존재하고 절�
 test('index.html은 루트 절대경로를 쓰지 않는다', () => {
   assert.doesNotMatch(read('index.html'), /(href|src)="\//);
 });
+
+test('js 폴더의 모든 파일이 미리 캐시 목록에 있다', async () => {
+  const { readdirSync } = await import('node:fs');
+  const sw = read('sw.js');
+  const list = JSON.parse(sw.match(/const APP_FILES = (\[[\s\S]*?\]);/)[1]);
+  const files = readdirSync(new URL('js/', root), { recursive: true })
+    .filter((f) => f.endsWith('.js'))
+    .map((f) => './js/' + f.split('\\').join('/'));
+  for (const f of files) assert.ok(list.includes(f), `${f}가 sw.js APP_FILES에 없음`);
+});

@@ -11,6 +11,8 @@ const BANNER_TEXT = {
   'storage-unavailable': '이 기기에 저장되지 않습니다. 백업을 자주 해주세요.',
   'save-failed': '저장에 실패했습니다. 백업을 자주 해주세요.',
   'corrupt-data': '저장된 데이터를 읽지 못해 새로 시작했습니다. 이전 데이터는 따로 보관되어 있습니다.',
+  'corrupt-unsaved': '저장된 데이터를 읽지 못했습니다. 기존 데이터를 지키기 위해 지금은 저장하지 않습니다.',
+  'newer-version': '더 새 버전에서 저장된 데이터입니다. 앱을 완전히 닫았다가 다시 열어주세요. 그 전까지는 저장하지 않습니다.',
 };
 
 function getStorage() {

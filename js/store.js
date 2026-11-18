@@ -31,33 +31,57 @@ export function newId(prefix) {
   return `${prefix}_${Date.now().toString(36)}${rand}`;
 }
 
-function loadInitial(storage, setError) {
-  if (!storage) {
-    setError('storage-unavailable');
-    return defaultState();
+const isObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
+
+// 저장된 데이터를 현재 스키마로 맞춘다. 버전이 올라가면 여기에 단계별 변환을 추가한다.
+function migrate(data) {
+  const base = defaultState();
+  const out = { ...base, ...data, version: SCHEMA_VERSION };
+  for (const key of ['people', 'places', 'checklist', 'transit', 'expenses']) {
+    if (!Array.isArray(out[key])) out[key] = [];
   }
+  out.trip = isObject(data.trip) ? { ...base.trip, ...data.trip } : base.trip;
+  if (!Array.isArray(out.trip.days) || out.trip.days.length === 0) out.trip.days = base.trip.days;
+  out.ui = isObject(data.ui) ? { ...base.ui, ...data.ui } : base.ui;
+  return out;
+}
+
+// 반환: { state, error, readOnly } — readOnly이면 기존 데이터를 지키기 위해 저장하지 않는다.
+function loadInitial(storage) {
+  if (!storage) return { state: defaultState(), error: 'storage-unavailable', readOnly: false };
   let raw;
   try {
     raw = storage.getItem(STORAGE_KEY);
   } catch {
-    setError('storage-unavailable');
-    return defaultState();
+    return { state: defaultState(), error: 'storage-unavailable', readOnly: false };
   }
-  if (raw == null) return defaultState();
-  try {
-    return JSON.parse(raw);
-  } catch {
-    // 깨진 데이터는 덮어쓰지 않고 별도 키에 보존한다.
-    try { storage.setItem(CORRUPT_PREFIX + Date.now(), raw); } catch { /* 보존 실패는 무시 */ }
-    setError('corrupt-data');
-    return defaultState();
+  if (raw == null) return { state: defaultState(), error: null, readOnly: false };
+
+  let parsed;
+  try { parsed = JSON.parse(raw); } catch { parsed = undefined; }
+
+  if (!isObject(parsed)) {
+    // 깨진 데이터는 별도 키에 보존한다. 보존에 실패하면 원래 키도 덮어쓰지 않는다.
+    try {
+      storage.setItem(CORRUPT_PREFIX + Date.now(), raw);
+      return { state: defaultState(), error: 'corrupt-data', readOnly: false };
+    } catch {
+      return { state: defaultState(), error: 'corrupt-unsaved', readOnly: true };
+    }
   }
+  if (typeof parsed.version === 'number' && parsed.version > SCHEMA_VERSION) {
+    return { state: migrate(parsed), error: 'newer-version', readOnly: true };
+  }
+  return { state: migrate(parsed), error: null, readOnly: false };
 }
 
 export function createStore(storage) {
   const subscribers = new Set();
+  const loaded = loadInitial(storage);
+  let state = loaded.state;
+  const writable = storage && !loaded.readOnly;
   const store = {
-    lastError: null,
+    lastError: loaded.error,
     get() {
       return structuredClone(state);
     },
@@ -65,7 +89,7 @@ export function createStore(storage) {
       const draft = structuredClone(state);
       fn(draft);
       state = draft;
-      if (storage) {
+      if (writable) {
         try {
           storage.setItem(STORAGE_KEY, JSON.stringify(state));
         } catch {
@@ -79,6 +103,5 @@ export function createStore(storage) {
       return () => subscribers.delete(fn);
     },
   };
-  let state = loadInitial(storage, (e) => { store.lastError = e; });
   return store;
 }
