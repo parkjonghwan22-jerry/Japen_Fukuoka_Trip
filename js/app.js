@@ -56,3 +56,7 @@ for (const b of buttons) {
 render(resolveTab(store.get().ui?.tab));
 
 navigator.storage?.persist?.().catch(() => {});
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
