@@ -1,11 +1,12 @@
 import { createStore } from './store.js';
 import { resolveTab } from './router.js';
+import * as homeTab from './tabs/home.js';
 import * as mapTab from './tabs/map.js';
 import * as checklistTab from './tabs/checklist.js';
 import * as transitTab from './tabs/transit.js';
 import * as expenseTab from './tabs/expense.js';
 
-const MODULES = { map: mapTab, checklist: checklistTab, transit: transitTab, expense: expenseTab };
+const MODULES = { home: homeTab, map: mapTab, checklist: checklistTab, transit: transitTab, expense: expenseTab };
 
 const BANNER_TEXT = {
   'storage-unavailable': '이 기기에 저장되지 않습니다. 백업을 자주 해주세요.',
@@ -55,7 +56,8 @@ for (const b of buttons) {
   });
 }
 
-render(resolveTab(store.get().ui?.tab));
+// 앱은 항상 홈에서 시작한다
+render('home');
 
 navigator.storage?.persist?.().catch(() => {});
 

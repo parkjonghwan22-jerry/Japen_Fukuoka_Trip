@@ -35,4 +35,5 @@
 
 - 테스트: `npm test`
 - 로컬 실행: `python3 -m http.server 8080` → http://localhost:8080
-- 아이콘 다시 만들기: `python3 tools/make_icons.py`
+- 아이콘 다시 만들기: `python3 tools/make_icons.py` (macOS 글꼴 사용)
+- 사진 넣기: `python3 tools/prepare_photo.py <원본>` → `js/photos.js`와 `sw.js` APP_FILES에 추가

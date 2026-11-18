@@ -21,7 +21,7 @@ test('저장된 값이 없으면 기본 상태', () => {
   assert.equal(store.get().trip.days.length, 4);
   assert.equal(store.get().trip.days[0].date, '2026-12-31');
   assert.equal(store.get().trip.days[3].label, '1/3(일)');
-  assert.equal(store.get().ui.tab, 'map');
+  assert.equal(store.get().ui.tab, 'home');
 });
 
 test('update 결과가 저장되고 다시 읽힌다', () => {
@@ -33,7 +33,7 @@ test('update 결과가 저장되고 다시 읽힌다', () => {
 test('get은 내부 상태를 직접 노출하지 않는다', () => {
   const store = createStore(memoryStorage());
   store.get().ui.tab = 'hacked';
-  assert.equal(store.get().ui.tab, 'map');
+  assert.equal(store.get().ui.tab, 'home');
 });
 
 test('구독자에게 알리고 해제할 수 있다', () => {
@@ -95,7 +95,7 @@ test('옛 데이터에 빠진 키는 기본값으로 채운다', () => {
   const store = createStore(memoryStorage({ [STORAGE_KEY]: JSON.stringify(old) }));
   const s = store.get();
   assert.equal(s.places[0].name, '하카타역');
-  assert.equal(s.ui.tab, 'map');
+  assert.equal(s.ui.tab, 'home');
   assert.deepEqual(s.expenses, []);
   assert.equal(s.trip.days.length, 4);
   assert.equal(store.lastError, null);

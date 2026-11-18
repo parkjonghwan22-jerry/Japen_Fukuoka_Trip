@@ -73,7 +73,7 @@ button { font-family: inherit; }
   height: calc(var(--tabbar-h) + var(--safe-bottom));
   padding-bottom: var(--safe-bottom);
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(8px);
   border-top: 1px solid var(--line);
@@ -107,4 +107,76 @@ button { font-family: inherit; }
   border-radius: 0 0 3px 3px;
   background: var(--primary);
   transform: translateX(-50%);
+}
+
+/* ---------- 홈 ---------- */
+.home { padding-bottom: 32px; }
+.home-head { margin-bottom: 20px; }
+.home-head h1 { margin: 0; font-size: 30px; }
+.home-dates { margin: 4px 0 0; color: var(--text-2); font-size: 16px; font-weight: 500; }
+
+.photo-card {
+  margin: 0;
+  padding: 10px 10px 12px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 1px 2px rgba(25, 31, 40, 0.06), 0 10px 28px rgba(25, 31, 40, 0.12);
+  border: 1px solid var(--line);
+}
+.photo-main {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 12px;
+  background: var(--subtle);
+}
+
+.thumbs {
+  display: flex;
+  gap: 10px;
+  margin: 18px -20px 0;
+  padding: 4px 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.thumbs::-webkit-scrollbar { display: none; }
+
+.thumb {
+  flex: 0 0 auto;
+  width: 60px;
+  height: 80px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background: var(--subtle);
+  overflow: hidden;
+  scroll-snap-align: start;
+  cursor: pointer;
+}
+.thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.thumb[aria-current="true"] { border-color: var(--primary); }
+
+.thumb-add {
+  border: 1.5px dashed #c5cad1;
+  background: #fff;
+  color: var(--muted);
+  font-size: 28px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 16px);
+  transform: translateX(-50%);
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(25, 31, 40, 0.88);
+  color: #fff;
+  font-size: 15px;
+  white-space: nowrap;
+  z-index: 1100;
 }
