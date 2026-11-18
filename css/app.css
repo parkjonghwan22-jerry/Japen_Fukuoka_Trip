@@ -181,28 +181,47 @@ button { font-family: inherit; }
   z-index: 1100;
 }
 
-/* ---------- 시작 화면 ---------- */
+/* ---------- 시작 화면 ----------
+   안드로이드 시스템 시작 화면(어두운 바탕 + 가운데 둥근 아이콘)과 똑같이 시작해서
+   아이콘 뒤로 사진이 떠오르게 한다 → 아이콘 → 사진 → 홈이 한 흐름으로 보인다 */
 #splash {
   position: fixed;
   inset: 0;
   z-index: 2000;
-  background: #111;
-  transition: opacity 0.45s ease;
-  /* splash.js가 실행되지 못해도 4초 뒤 스스로 사라져 앱을 가리지 않는다 */
-  animation: splash-auto-hide 0.45s ease 4s forwards;
+  background: #111111; /* manifest background_color와 같게 */
+  transition: opacity 0.5s ease;
+  /* splash.js가 실행되지 못해도 5초 뒤 스스로 사라져 앱을 가리지 않는다 */
+  animation: splash-auto-hide 0.5s ease 5s forwards;
 }
 @keyframes splash-auto-hide {
   to { opacity: 0; visibility: hidden; pointer-events: none; }
 }
-#splash img {
+#splash .splash-photo {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity 0.8s ease, transform 2.4s ease-out;
 }
+#splash .splash-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 160px;   /* 안드로이드 시작 화면 아이콘 크기(약 160dp)에 맞춤 */
+  height: 160px;
+  margin: -80px 0 0 -80px;
+  border-radius: 50%;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+#splash.splash-show-photo .splash-photo { opacity: 1; transform: scale(1); }
+#splash.splash-show-photo .splash-icon { opacity: 0; transform: scale(1.08); }
 #splash.splash-hide { opacity: 0; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) {
-  #splash { transition: none; }
+  #splash, #splash .splash-photo, #splash .splash-icon { transition: none; }
 }
 
 /* ---------- 지도 ---------- */
