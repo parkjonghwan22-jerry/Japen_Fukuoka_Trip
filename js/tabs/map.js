@@ -5,6 +5,10 @@ import { closeSheet, isSheetOpen } from '../ui/sheet.js';
 import { openPlaceCard } from '../ui/place-card.js';
 import { openPlaceForm } from '../ui/place-form.js';
 import { openAddMenu } from '../ui/place-add.js';
+import { createDayPanel } from '../ui/day-panel.js';
+import { moveInDay, addToDay } from '../itinerary.js';
+
+const PANEL_PEEK = 76; // 접힌 일정 패널 높이(px) — CSS .panel 과 맞춤
 
 const CENTER = [33.5902, 130.4017]; // 하카타~텐진
 const ZOOM = 13;
@@ -92,7 +96,7 @@ function draw(layerGroup, places, filter, days, isSample, { fit = true, onOpen }
   }
 
   if (!fit) return;
-  if (points.length > 1) map.fitBounds(points, { paddingTopLeft: [32, 90], paddingBottomRight: [32, 32], maxZoom: 15 });
+  if (points.length > 1) map.fitBounds(points, { paddingTopLeft: [32, 90], paddingBottomRight: [32, 32 + PANEL_PEEK], maxZoom: 15 });
   else if (points.length === 1) map.setView(points[0], 15);
   else map.setView(CENTER, ZOOM);
 }
@@ -138,13 +142,40 @@ export function mount(el, store) {
   const note = el.querySelector('.map-note');
   const chips = [...el.querySelectorAll('.chip')];
 
+  const panel = createDayPanel(el.querySelector('.map-page'), {
+    onSelect: (p) => focusPlace(p),
+    onMove: (id, dir) => {
+      store.update((d) => { d.places = moveInDay(d.places, id, dir); });
+      render({ fit: false });
+    },
+    onAddToDay: (id, dayId) => {
+      store.update((d) => { d.places = addToDay(d.places, id, dayId); });
+      render({ fit: false });
+      toast(`${days.find((d) => d.id === dayId)?.label ?? ''} 일정에 넣었어요`);
+    },
+  });
+  // ＋ 버튼은 패널 위에 오도록 패널 뒤에 둔다
+  panel.element.after(el.querySelector('.fab'));
+
+  // 장소로 이동: 패널을 접고, 장소가 화면 위쪽(카드에 가리지 않게)에 오도록 맞춘 뒤 카드 열기
+  function focusPlace(p) {
+    panel.collapse();
+    const zoom = Math.max(map.getZoom(), 16);
+    const h = map.getSize().y;
+    const point = map.project([p.lat, p.lng], zoom).add([0, h * 0.22]);
+    map.flyTo(map.unproject(point, zoom), zoom, { duration: 0.6 });
+    if (store.get().places.length) setTimeout(() => openCard(p), 350);
+  }
+
   function render({ fit = true } = {}) {
     if (!map) return;
     const state = store.get();
     const isSample = state.places.length === 0;
+    const places = isSample ? SAMPLE_PLACES : state.places;
     note.hidden = !isSample;
     chips.forEach((c) => c.setAttribute('aria-selected', String(c.dataset.filter === filter)));
-    draw(layerGroup, isSample ? SAMPLE_PLACES : state.places, filter, days, isSample, { fit, onOpen: openCard });
+    draw(layerGroup, places, filter, days, isSample, { fit, onOpen: openCard });
+    panel.update({ places, days, filter, isSample });
   }
 
   function setFilter(f) {

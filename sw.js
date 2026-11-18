@@ -1,5 +1,5 @@
 // 배포할 때마다 CACHE_VERSION을 올려야 폰에 새 버전이 반영된다.
-const CACHE_VERSION = 'v9';
+const CACHE_VERSION = 'v10';
 const CACHE_NAME = 'fukuoka-trip-' + CACHE_VERSION;
 
 const APP_FILES = [
@@ -14,6 +14,8 @@ const APP_FILES = [
   "./js/photos.js",
   "./js/map/model.js",
   "./js/places.js",
+  "./js/itinerary.js",
+  "./js/ui/day-panel.js",
   "./js/geocode.js",
   "./js/ui/dom.js",
   "./js/ui/sheet.js",
