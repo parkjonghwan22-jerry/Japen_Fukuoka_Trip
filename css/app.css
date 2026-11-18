@@ -514,4 +514,4 @@ button { font-family: inherit; }
   background: #fff; color: var(--text-2); font-size: 14px; font-weight: 600; cursor: pointer;
 }
 .map-page .leaflet-bottom { bottom: 76px; } /* 출처 표기를 접힌 패널 위로 */
-.map-page:has(.panel[data-state="expanded"]) .leaflet-bottom { display: none; }
+.map-page:has(.panel[data-state="expanded"]) .leaflet-bottom { bottom: 60%; } /* 펼친 패널 위로 — 출처 표기는 항상 보이게 */
