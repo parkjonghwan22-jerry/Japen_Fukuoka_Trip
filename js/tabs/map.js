@@ -1,4 +1,10 @@
 import { MAP_FILTERS, CANDIDATE_COLOR, STAY_COLOR, visibleLayers, SAMPLE_PLACES } from '../map/model.js';
+import { savePlace, deletePlace } from '../places.js';
+import { esc, toast } from '../ui/dom.js';
+import { closeSheet, isSheetOpen } from '../ui/sheet.js';
+import { openPlaceCard } from '../ui/place-card.js';
+import { openPlaceForm } from '../ui/place-form.js';
+import { openAddMenu } from '../ui/place-add.js';
 
 const CENTER = [33.5902, 130.4017]; // 하카타~텐진
 const ZOOM = 13;
@@ -7,7 +13,6 @@ const ATTRIBUTION = '© <a href="https://www.openstreetmap.org/copyright">OpenSt
 
 let map = null;
 
-const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 function filterLabels(days) {
   const labels = { all: '전체', candidates: '후보' };
@@ -49,7 +54,14 @@ function popup(p, sub) {
   return `<div class="pop"><strong>${esc(p.name)}</strong>${sub ? `<span>${esc(sub)}</span>` : ''}</div>`;
 }
 
-function draw(layerGroup, places, filter, days, isSample) {
+// 예시 장소는 말풍선, 실제 장소는 누르면 onOpen(place)
+function attach(marker, p, sub, isSample, onOpen) {
+  if (isSample) marker.bindPopup(popup(p, sub));
+  else marker.on('click', () => onOpen(p));
+  return marker;
+}
+
+function draw(layerGroup, places, filter, days, isSample, { fit = true, onOpen } = {}) {
   layerGroup.clearLayers();
   const v = visibleLayers(places, filter);
   const dayLabel = Object.fromEntries(days.map((d) => [d.id, d.label]));
@@ -63,25 +75,34 @@ function draw(layerGroup, places, filter, days, isSample) {
     }
     r.places.forEach((p, i) => {
       const sub = [dayLabel[r.dayId], p.time].filter(Boolean).join(' · ');
-      L.marker([p.lat, p.lng], { icon: numberIcon(i + 1, r.color, isSample), zIndexOffset: 100 })
-        .bindPopup(popup(p, sub)).addTo(layerGroup);
+      attach(L.marker([p.lat, p.lng], { icon: numberIcon(i + 1, r.color, isSample), zIndexOffset: 100 }), p, sub, isSample, onOpen)
+        .addTo(layerGroup);
       points.push([p.lat, p.lng]);
     });
   }
   for (const p of v.candidates) {
-    L.marker([p.lat, p.lng], { icon: dotIcon(isSample || dimCandidates) })
-      .bindPopup(popup(p, '후보')).addTo(layerGroup);
+    attach(L.marker([p.lat, p.lng], { icon: dotIcon(isSample || dimCandidates) }), p, '후보', isSample, onOpen)
+      .addTo(layerGroup);
     if (!dimCandidates) points.push([p.lat, p.lng]);
   }
   for (const p of v.stays) {
-    L.marker([p.lat, p.lng], { icon: stayIcon(isSample), zIndexOffset: 50 })
-      .bindPopup(popup(p, '숙소')).addTo(layerGroup);
+    attach(L.marker([p.lat, p.lng], { icon: stayIcon(isSample), zIndexOffset: 50 }), p, '숙소', isSample, onOpen)
+      .addTo(layerGroup);
     points.push([p.lat, p.lng]);
   }
 
+  if (!fit) return;
   if (points.length > 1) map.fitBounds(points, { paddingTopLeft: [32, 90], paddingBottomRight: [32, 32], maxZoom: 15 });
   else if (points.length === 1) map.setView(points[0], 15);
   else map.setView(CENTER, ZOOM);
+}
+
+// 저장한 장소가 지금 필터에서 안 보이면 보이는 필터로 바꾼다
+function filterShowing(place, filter) {
+  if (filter === 'all') return 'all';
+  if (place.kind === 'plan') return place.dayId === filter ? filter : place.dayId;
+  if (place.kind === 'candidate') return filter;
+  return filter; // 숙소는 대부분 필터에서 보인다
 }
 
 export function mount(el, store) {
@@ -94,12 +115,9 @@ export function mount(el, store) {
       </section>`;
     return;
   }
-  const state = store.get();
-  const days = state.trip.days;
+  const days = store.get().trip.days;
   const labels = filterLabels(days);
-  const isSample = state.places.length === 0;
-  const places = isSample ? SAMPLE_PLACES : state.places;
-  let filter = MAP_FILTERS.includes(state.ui.mapFilter) ? state.ui.mapFilter : 'all';
+  let filter = MAP_FILTERS.includes(store.get().ui.mapFilter) ? store.get().ui.mapFilter : 'all';
 
   el.innerHTML = `
     <section class="map-page">
@@ -108,31 +126,85 @@ export function mount(el, store) {
         <div class="chips" role="tablist" aria-label="일차 선택">
           ${MAP_FILTERS.map((f) => `<button type="button" class="chip" role="tab" data-filter="${f}">${esc(labels[f] ?? f)}</button>`).join('')}
         </div>
-        ${isSample ? '<p class="map-note">예시 장소입니다. 3단계에서 직접 추가할 수 있어요.</p>' : ''}
+        <p class="map-note" hidden>예시 장소입니다. 지도를 길게 누르거나 ＋로 직접 추가해보세요.</p>
       </div>
+      <button type="button" class="fab" aria-label="장소 추가">＋</button>
     </section>`;
 
   map = L.map(el.querySelector('#map'), { zoomControl: false, attributionControl: true }).setView(CENTER, ZOOM);
   L.tileLayer(TILE_URL, { maxZoom: 19, attribution: ATTRIBUTION }).addTo(map);
   map.attributionControl.setPrefix(false);
   const layerGroup = L.layerGroup().addTo(map);
-
+  const note = el.querySelector('.map-note');
   const chips = [...el.querySelectorAll('.chip')];
-  function select(f) {
-    filter = f;
-    chips.forEach((c) => c.setAttribute('aria-selected', String(c.dataset.filter === f)));
-    draw(layerGroup, places, f, days, isSample);
+
+  function render({ fit = true } = {}) {
+    if (!map) return;
+    const state = store.get();
+    const isSample = state.places.length === 0;
+    note.hidden = !isSample;
+    chips.forEach((c) => c.setAttribute('aria-selected', String(c.dataset.filter === filter)));
+    draw(layerGroup, isSample ? SAMPLE_PLACES : state.places, filter, days, isSample, { fit, onOpen: openCard });
   }
-  chips.forEach((c) => c.addEventListener('click', () => {
-    store.update((d) => { d.ui.mapFilter = c.dataset.filter; });
-    select(c.dataset.filter);
-  }));
+
+  function setFilter(f) {
+    filter = f;
+    store.update((d) => { d.ui.mapFilter = f; });
+  }
+
+  function save(place) {
+    const before = store.get().places;
+    const next = savePlace(before, place);
+    const saved = place.id
+      ? next.find((p) => p.id === place.id)
+      : next.find((p) => !before.some((b) => b.id === p.id));
+    store.update((d) => { d.places = next; });
+    const nextFilter = saved ? filterShowing(saved, filter) : filter;
+    const changed = nextFilter !== filter;
+    if (changed) setFilter(nextFilter);
+    render({ fit: changed });
+    toast(place.id ? '저장했어요' : '추가했어요');
+  }
+
+  function openForm(initial) {
+    openPlaceForm(initial, { days, onSave: save });
+  }
+
+  function openCard(place) {
+    openPlaceCard(place, {
+      days,
+      onEdit: (p) => openForm(p),
+      onDelete: (p) => {
+        store.update((d) => { d.places = deletePlace(d.places, p.id); });
+        render({ fit: false });
+        toast('삭제했어요');
+      },
+    });
+  }
+
+  chips.forEach((c) => c.addEventListener('click', () => { setFilter(c.dataset.filter); render(); }));
+
+  // 지도를 길게 누르면 그 자리에 새 장소
+  map.on('contextmenu', (e) => {
+    openForm({ lat: e.latlng.lat, lng: e.latlng.lng, kind: filter.startsWith('d') ? 'plan' : 'candidate', dayId: filter.startsWith('d') ? filter : null });
+  });
+
+  el.querySelector('.fab').addEventListener('click', () => {
+    openAddMenu({
+      onPick: (r) => openForm({
+        ...r,
+        kind: filter.startsWith('d') ? 'plan' : 'candidate',
+        dayId: filter.startsWith('d') ? filter : null,
+      }),
+    });
+  });
 
   // 탭 전환 직후 크기를 다시 계산해야 지도가 깨지지 않는다
-  requestAnimationFrame(() => { if (map) { map.invalidateSize(); select(filter); } });
+  requestAnimationFrame(() => { if (map) { map.invalidateSize(); render(); } });
 }
 
 export function unmount() {
+  if (isSheetOpen()) closeSheet();
   if (map) {
     map.remove();
     map = null;

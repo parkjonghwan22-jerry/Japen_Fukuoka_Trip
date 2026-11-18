@@ -1,16 +1,7 @@
 import { BUNDLED_PHOTOS } from '../photos.js';
+import { toast } from '../ui/dom.js';
 
 let selected = 0; // 앱이 켜져 있는 동안 마지막으로 고른 사진을 기억
-
-function toast(text) {
-  document.querySelector('.toast')?.remove();
-  const el = document.createElement('div');
-  el.className = 'toast';
-  el.setAttribute('role', 'status');
-  el.textContent = text;
-  document.body.append(el);
-  setTimeout(() => el.remove(), 2200);
-}
 
 export function mount(el) {
   const photos = BUNDLED_PHOTOS;
