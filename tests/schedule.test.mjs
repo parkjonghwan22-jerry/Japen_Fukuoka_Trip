@@ -77,10 +77,15 @@ test(`노선: 후보가 ${SCROLL_FROM}곳 이상일 때만 목록에 따로 스�
   assert.match(routeHtml([{ name: 'A', then: many.slice(1) }]), /class="cands"/);
 });
 
-test('노선: 글자는 HTML로 해석되지 않고, 예약 값이 없으면 예약 없음', () => {
-  const html = routeHtml([{ name: '<b>x</b>' }]);
-  assert.match(html, /&lt;b&gt;x&lt;\/b&gt;/);
-  assert.match(html, /badge-none">예약 없음/);
+test('노선: 글자는 HTML로 해석되지 않는다', () => {
+  assert.match(routeHtml([{ name: '<b>x</b>' }]), /&lt;b&gt;x&lt;\/b&gt;/);
+});
+
+test('노선: 예약 값을 적지 않으면 예약 줄을 숨기고, none이면 예약 없음', () => {
+  assert.doesNotMatch(routeHtml([{ name: 'A', area: '하카타' }]), /badge/);
+  assert.doesNotMatch(routeHtml([{ name: 'A' }]), /class="info"/);
+  assert.match(routeHtml([{ name: 'A', reservation: 'none' }]), /badge-none">예약 없음/);
+  assert.match(routeHtml([{ name: 'A', reservationNote: '18시' }]), /badge-none/);
 });
 
 test('일정이 비어 있으면 안내 문구', () => {

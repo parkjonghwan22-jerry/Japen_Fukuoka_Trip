@@ -11,9 +11,13 @@ function infoHtml(p) {
   const rows = [];
   if (p.area) rows.push(['위치', esc(p.area)]);
   if (p.fromStay) rows.push(['숙소에서', esc(p.fromStay)]);
-  const key = resvKey(p);
-  rows.push(['예약', `<span class="badge badge-${key}">${RESERVATION[key]}</span>`
-    + (p.reservationNote ? ` <span class="resv-note">${esc(p.reservationNote)}</span>` : '')]);
+  // 예약 값을 적지 않았으면 예약 줄을 숨긴다 (모르는 것을 '예약 없음'으로 보이지 않게)
+  if (p.reservation !== undefined || p.reservationNote) {
+    const key = resvKey(p);
+    rows.push(['예약', `<span class="badge badge-${key}">${RESERVATION[key]}</span>`
+      + (p.reservationNote ? ` <span class="resv-note">${esc(p.reservationNote)}</span>` : '')]);
+  }
+  if (!rows.length) return '';
   return `<dl class="info">${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
 }
 

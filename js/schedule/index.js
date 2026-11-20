@@ -11,7 +11,7 @@
 //     name: '다자이후 텐만구',
 //     area: '다자이후시',                 위치
 //     desc: '오전 일찍 가기',              설명 (줄바꿈은 \n)
-//     reservation: 'done',               'done' 예약 완료 | 'need' 예약 필요 | 'none' 예약 없음(기본)
+//     reservation: 'done',               'done' 예약 완료 | 'need' 예약 필요 | 'none' 예약 없음 (생략하면 예약 줄을 숨김)
 //     reservationNote: '예약번호 1234',   예약 관련 메모
 //     fromStay: '지하철 40분 · 14km',     숙소로부터 거리 (적은 그대로 표시)
 //     then: [ 후보, ... ],                이 일정과 다음 일정 사이에 갈 만한 곳
