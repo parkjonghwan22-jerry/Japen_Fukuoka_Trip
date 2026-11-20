@@ -20,4 +20,3 @@ export function toast(text) {
   setTimeout(() => el.remove(), 2400);
 }
 
-export const stayLabel = (m) => (m == null ? '' : m < 60 ? `${m}분` : m % 60 ? `${Math.floor(m / 60)}시간 ${m % 60}분` : `${m / 60}시간`);

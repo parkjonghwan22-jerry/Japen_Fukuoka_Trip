@@ -1,4 +1,4 @@
-export const TABS = ['home', 'map', 'checklist', 'transit', 'expense'];
+export const TABS = ['home', 'schedule'];
 
 export function resolveTab(tab) {
   return TABS.includes(tab) ? tab : 'home';

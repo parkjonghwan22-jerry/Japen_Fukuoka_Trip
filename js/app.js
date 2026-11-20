@@ -1,12 +1,9 @@
 import { createStore } from './store.js';
 import { resolveTab } from './router.js';
 import * as homeTab from './tabs/home.js';
-import * as mapTab from './tabs/map.js';
-import * as checklistTab from './tabs/checklist.js';
-import * as transitTab from './tabs/transit.js';
-import * as expenseTab from './tabs/expense.js';
+import * as scheduleTab from './tabs/schedule.js';
 
-const MODULES = { home: homeTab, map: mapTab, checklist: checklistTab, transit: transitTab, expense: expenseTab };
+const MODULES = { home: homeTab, schedule: scheduleTab };
 
 const BANNER_TEXT = {
   'storage-unavailable': '이 기기에 저장되지 않습니다. 백업을 자주 해주세요.',
