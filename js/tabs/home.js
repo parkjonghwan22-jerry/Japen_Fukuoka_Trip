@@ -11,7 +11,7 @@ export function mount(el) {
     <section class="page home">
       <header class="home-head">
         <h1>후쿠오카</h1>
-        <p class="home-dates">2026.12.31(목) – 2027.1.3(일)</p>
+        <p class="home-dates">2026.12.31(목) – 2027.1.4(월)</p>
       </header>
       <figure class="photo-card">
         <img class="photo-main" alt="">

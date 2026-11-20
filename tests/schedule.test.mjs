@@ -1,0 +1,88 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { DAYS, STAYS, RESERVATION } from '../js/schedule/index.js';
+import { DEMO_DAYS, DEMO_STAYS } from '../js/schedule/demo.js';
+import { routeHtml, SCROLL_FROM } from '../js/ui/route.js';
+
+const DAY_KEYS = new Set(['date', 'label', 'title', 'stay', 'stops']);
+const STOP_KEYS = new Set(['time', 'name', 'area', 'desc', 'reservation', 'reservationNote', 'fromStay', 'then']);
+const CAND_KEYS = new Set(['name', 'area', 'desc', 'reservation', 'reservationNote', 'fromStay']);
+
+// 손으로 입력한 일정 데이터의 실수(오타 난 항목 이름, 빠진 이름, 잘못된 값)를 찾는다
+function problems(days, stays) {
+  const out = [];
+  const checkPlace = (p, where, allowed) => {
+    for (const k of Object.keys(p)) if (!allowed.has(k)) out.push(`${where}: 모르는 항목 '${k}'`);
+    if (typeof p.name !== 'string' || !p.name.trim()) out.push(`${where}: name이 비어 있음`);
+    if (p.reservation !== undefined && !(p.reservation in RESERVATION)) out.push(`${where}: reservation '${p.reservation}'은 done/need/none 중 하나여야 함`);
+    for (const k of ['area', 'desc', 'reservationNote', 'fromStay']) {
+      if (p[k] != null && typeof p[k] !== 'string') out.push(`${where}: ${k}는 글자여야 함`);
+    }
+  };
+  days.forEach((d, di) => {
+    const dw = `${di + 1}일차`;
+    for (const k of Object.keys(d)) if (!DAY_KEYS.has(k)) out.push(`${dw}: 모르는 항목 '${k}'`);
+    if (d.stay !== null && !(d.stay in stays)) out.push(`${dw}: 숙소 '${d.stay}'가 stays.js에 없음`);
+    if (!Array.isArray(d.stops)) { out.push(`${dw}: stops는 목록이어야 함`); return; }
+    d.stops.forEach((s, si) => {
+      const sw = `${dw} ${si + 1}번째 일정(${s.name ?? '?'})`;
+      checkPlace(s, sw, STOP_KEYS);
+      if (s.time !== undefined && !/^([01]\d|2[0-3]):[0-5]\d$/.test(s.time)) out.push(`${sw}: time은 '09:30' 형식`);
+      if (s.then !== undefined && !Array.isArray(s.then)) out.push(`${sw}: then은 목록이어야 함`);
+      (s.then ?? []).forEach((c, ci) => checkPlace(c, `${sw} 후보 ${ci + 1}(${c.name ?? '?'})`, CAND_KEYS));
+    });
+  });
+  return out;
+}
+
+test('일정은 12/31(목)부터 1/4(월)까지 5일', () => {
+  assert.deepEqual(DAYS.map((d) => d.date), ['2026-12-31', '2027-01-01', '2027-01-02', '2027-01-03', '2027-01-04']);
+});
+
+test('숙소: 1·2일차 같은 곳, 3일차 료칸, 4일차 다른 곳, 5일차 없음', () => {
+  assert.deepEqual(DAYS.map((d) => d.stay), ['hotelA', 'hotelA', 'ryokan', 'hotelB', null]);
+});
+
+test('일정 데이터에 입력 실수가 없다', () => {
+  assert.deepEqual(problems(DAYS, STAYS), []);
+});
+
+test('예시 데이터에도 입력 실수가 없다', () => {
+  assert.deepEqual(problems(DEMO_DAYS, DEMO_STAYS), []);
+  assert.equal(DEMO_DAYS.length, DAYS.length);
+});
+
+test('검사기는 오타와 빠진 값을 잡는다', () => {
+  const bad = [{ date: 'x', label: 'x', stay: 'nope', stops: [
+    { name: '', resevation: 'done', time: '9:00', then: [{ name: 'A', reservation: 'yes' }] },
+  ] }];
+  const p = problems(bad, {});
+  assert.ok(p.some((m) => m.includes("숙소 'nope'")));
+  assert.ok(p.some((m) => m.includes("모르는 항목 'resevation'")));
+  assert.ok(p.some((m) => m.includes('name이 비어')));
+  assert.ok(p.some((m) => m.includes('time은')));
+  assert.ok(p.some((m) => m.includes("reservation 'yes'")));
+});
+
+test('노선: 후보가 있는 일정 뒤에만 사이 구간이 생긴다', () => {
+  const html = routeHtml([{ name: 'A', then: [{ name: 'a1' }] }, { name: 'B' }, { name: 'C', then: [] }]);
+  assert.equal(html.match(/class="stop"/g).length, 3);
+  assert.equal(html.match(/class="gap"/g).length, 1);
+  assert.match(html, /이 사이 후보 <b>1<\/b>곳/);
+});
+
+test(`노선: 후보가 ${SCROLL_FROM}곳 이상일 때만 목록에 따로 스크롤`, () => {
+  const many = Array.from({ length: SCROLL_FROM }, (_, i) => ({ name: `c${i}` }));
+  assert.match(routeHtml([{ name: 'A', then: many }]), /class="cands scroll"/);
+  assert.match(routeHtml([{ name: 'A', then: many.slice(1) }]), /class="cands"/);
+});
+
+test('노선: 글자는 HTML로 해석되지 않고, 예약 값이 없으면 예약 없음', () => {
+  const html = routeHtml([{ name: '<b>x</b>' }]);
+  assert.match(html, /&lt;b&gt;x&lt;\/b&gt;/);
+  assert.match(html, /badge-none">예약 없음/);
+});
+
+test('일정이 비어 있으면 안내 문구', () => {
+  assert.match(routeHtml([]), /아직 일정이 없습니다/);
+});

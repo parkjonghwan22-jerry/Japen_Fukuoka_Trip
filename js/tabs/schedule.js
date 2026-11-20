@@ -1,29 +1,46 @@
-import { SCHEDULE } from '../schedule.js';
+import { DAYS, STAYS } from '../schedule/index.js';
+import { DEMO_DAYS, DEMO_STAYS } from '../schedule/demo.js';
 import { esc } from '../ui/dom.js';
+import { openDay, close } from '../ui/day-view.js';
 
-function itemHtml(it) {
+const isDemo = () => new URLSearchParams(location.search).has('demo');
+
+function cardHtml(day, i, stayName) {
+  const n = day.stops?.length ?? 0;
+  const sub = [n ? `핵심 일정 ${n}곳` : '일정 없음', stayName].filter(Boolean).join(' · ');
   return `
-    <li class="sch-item">
-      <span class="sch-time">${esc(it.time ?? '')}</span>
-      <div class="sch-text">
-        <strong>${esc(it.title)}</strong>
-        ${it.memo ? `<p>${esc(it.memo)}</p>` : ''}
-      </div>
+    <li>
+      <button type="button" class="day-card" data-i="${i}">
+        <span class="day-kicker">${i + 1}일차 · ${esc(day.label)}</span>
+        <span class="day-title${day.title ? '' : ' empty'}">${esc(day.title || '아직 정하지 않음')}</span>
+        <span class="day-sub">${esc(sub)}</span>
+        <span class="chev" aria-hidden="true"></span>
+      </button>
     </li>`;
 }
 
 export function mount(el) {
-  const days = SCHEDULE.map((d, i) => `
-    <section class="sch-day">
-      <h2><span class="sch-num">${i + 1}일차</span> ${esc(d.label)}</h2>
-      ${d.items.length
-        ? `<ol class="sch-list">${d.items.map(itemHtml).join('')}</ol>`
-        : '<p class="placeholder">아직 일정이 없습니다</p>'}
-    </section>`).join('');
+  const demo = isDemo();
+  const days = demo ? DEMO_DAYS : DAYS;
+  const stays = demo ? DEMO_STAYS : STAYS;
+  const stayName = (d) => (d.stay && stays[d.stay]?.name) || '';
 
   el.innerHTML = `
     <section class="page schedule">
       <h1>일정</h1>
-      ${days}
+      <p class="sch-sub">2026.12.31(목) – 2027.1.4(월) · 4박 5일</p>
+      ${demo ? '<p class="demo-note">예시 데이터로 보는 중입니다 (주소의 ?demo)</p>' : ''}
+      <ol class="day-list">${days.map((d, i) => cardHtml(d, i, stayName(d))).join('')}</ol>
     </section>`;
+
+  el.querySelector('.day-list').addEventListener('click', (e) => {
+    const card = e.target.closest('.day-card');
+    if (!card) return;
+    const i = Number(card.dataset.i);
+    openDay(days[i], i, card, stayName(days[i]));
+  });
+}
+
+export function unmount() {
+  close({ animate: false });
 }

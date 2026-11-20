@@ -226,19 +226,175 @@ button { font-family: inherit; }
 
 
 /* ---------- 일정 ---------- */
-.schedule h1 { margin-bottom: 20px; }
-.sch-day + .sch-day { margin-top: 28px; }
-.sch-day h2 {
-  margin: 0 0 10px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid var(--text);
-  font-size: 20px;
-  font-weight: 700;
+:root {
+  --route: #1f3a5f;
+  --page-bg: #f4f5f7;
+  --ok-bg: #e6f6ec; --ok-text: #1b7a43;
+  --need-bg: #fff0e6; --need-text: #c2410c;
 }
-.sch-num { color: var(--primary); }
-.sch-list { list-style: none; margin: 0; padding: 0; }
-.sch-item { display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line); }
-.sch-time { flex: 0 0 52px; color: var(--primary); font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
-.sch-text { flex: 1; min-width: 0; }
-.sch-text strong { display: block; font-size: 17px; }
-.sch-text p { margin: 4px 0 0; color: var(--text-2); font-size: 15px; white-space: pre-wrap; word-break: break-word; }
+
+.chev {
+  display: inline-block; flex: 0 0 auto;
+  width: 9px; height: 9px;
+  border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+  transform: rotate(45deg); transition: transform 0.25s ease;
+  color: var(--muted);
+}
+.chev-left { transform: rotate(135deg); color: var(--text); width: 11px; height: 11px; }
+
+.sch-sub { margin: 0 0 20px; color: var(--text-2); font-size: 16px; font-weight: 500; }
+.demo-note { margin: 0 0 16px; padding: 10px 14px; border-radius: 12px; background: var(--warn-bg); color: var(--warn-text); font-size: 15px; }
+
+/* 일차 카드 목록 */
+.day-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.day-card {
+  position: relative; width: 100%;
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 16px 44px 16px 18px;
+  border: 1px solid var(--line); border-radius: 18px;
+  background: #fff; box-shadow: 0 1px 3px rgba(25, 31, 40, 0.06);
+  text-align: left; color: var(--text); cursor: pointer;
+}
+.day-card:active { background: var(--subtle); }
+.day-card .chev { position: absolute; right: 20px; top: 50%; margin-top: -5px; transform: rotate(-45deg); }
+.day-kicker { color: var(--primary); font-size: 15px; font-weight: 700; }
+.day-title { font-size: 20px; font-weight: 700; line-height: 1.4; }
+.day-title.empty { color: var(--muted); font-weight: 500; }
+.day-sub { color: var(--muted); font-size: 15px; }
+
+/* 일차 상세 화면 — 제목은 고정, 본문만 스크롤 */
+.dv {
+  position: fixed; inset: 0; z-index: 1200;
+  display: flex; flex-direction: column;
+  background: var(--page-bg);
+}
+.dv-head {
+  flex: 0 0 auto;
+  display: flex; align-items: flex-start; gap: 6px;
+  padding: calc(12px + var(--safe-top)) 16px 14px 6px;
+  background: #fff; border-bottom: 1px solid var(--line);
+}
+.dv-back {
+  flex: 0 0 auto; width: 48px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  border: 0; border-radius: 50%; background: none; cursor: pointer;
+}
+.dv-back:active { background: var(--subtle); }
+.dv-titles { min-width: 0; padding-top: 4px; }
+.dv-kicker { margin: 0; color: var(--primary); font-size: 15px; font-weight: 700; }
+.dv-title { margin: 0; font-size: 23px; font-weight: 700; line-height: 1.35; }
+.dv-stay { margin: 2px 0 0; color: var(--text-2); font-size: 15px; }
+.dv-body {
+  flex: 1; min-height: 0;
+  overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  padding: 18px 16px calc(32px + var(--safe-bottom));
+}
+.route-empty { margin: 8px 4px; color: var(--muted); font-size: 16px; }
+
+/* 노선: 왼쪽 세로선 + 점 */
+.route { list-style: none; margin: 0; padding: 0; }
+.route > li { position: relative; padding-left: 38px; }
+.route > li::before {
+  content: ""; position: absolute; left: 13px; top: 0; bottom: 0;
+  width: 3px; background: var(--route);
+}
+.route > li:first-child::before { top: 26px; }
+.route > li:last-child::before { bottom: auto; height: 26px; }
+.route > li:only-child::before { display: none; }
+.route > .gap:last-child::before { height: 22px; }
+.stop { padding-bottom: 14px; }
+.stop-dot {
+  position: absolute; left: 5px; top: 17px;
+  width: 19px; height: 19px; border-radius: 50%;
+  background: #fff; border: 4px solid var(--route);
+  z-index: 1;
+}
+.stop-card {
+  padding: 14px 16px; border-radius: 16px;
+  background: #fff; box-shadow: 0 1px 3px rgba(25, 31, 40, 0.07);
+}
+.stop-time { margin: 0; color: var(--primary); font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stop-name { margin: 0; font-size: 19px; font-weight: 700; line-height: 1.4; }
+.desc { margin: 6px 0 0; color: var(--text-2); font-size: 16px; white-space: pre-wrap; word-break: break-word; }
+
+.info { margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; }
+.info div { display: flex; gap: 10px; align-items: baseline; }
+.info dt { flex: 0 0 64px; color: var(--muted); font-size: 14px; }
+.info dd { flex: 1; min-width: 0; margin: 0; font-size: 15px; word-break: break-word; }
+.badge { display: inline-block; padding: 1px 9px; border-radius: 999px; font-size: 13px; font-weight: 700; }
+.badge-done { background: var(--ok-bg); color: var(--ok-text); }
+.badge-need { background: var(--need-bg); color: var(--need-text); }
+.badge-none { background: var(--subtle); color: var(--muted); }
+.resv-note { color: var(--text-2); font-size: 14px; }
+
+/* 점과 점 사이: 누르면 위아래로 펼쳐지는 후보 목록 */
+.gap { padding-bottom: 14px; }
+.route > .gap { padding-left: 0; }
+.gap-toggle {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; gap: 10px;
+  min-height: 44px; margin-left: 2px; padding: 0 14px 0 0;
+  border: 0; background: none; color: var(--text-2);
+  font-size: 15px; font-weight: 600; cursor: pointer;
+}
+.gap-toggle b { color: var(--primary); }
+.gap-plus {
+  width: 25px; height: 25px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--page-bg); border: 2px solid var(--route);
+  color: var(--route); font-size: 17px; font-weight: 700; line-height: 1;
+  transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
+}
+.gap.open .gap-plus { transform: rotate(45deg); background: var(--route); color: #fff; }
+.gap.open .gap-toggle .chev { transform: rotate(225deg); }
+
+.gap-panel {
+  display: grid; grid-template-rows: 0fr;
+  margin-left: 38px;
+  transition: grid-template-rows 0.3s ease;
+}
+.gap.open .gap-panel { grid-template-rows: 1fr; }
+.gap-clip { min-height: 0; overflow: hidden; }
+.cands {
+  list-style: none; margin: 4px 0 0; padding: 4px 14px;
+  border-radius: 14px; background: #fff;
+  border: 1px dashed #c5ccd6;
+}
+/* 후보가 많으면 이 목록만 따로 스크롤 — 끝에 닿아도 본문까지 밀리지 않게 */
+.cands.scroll {
+  max-height: 45dvh;
+  overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+}
+.cands.scroll:not(.at-end) {
+  -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent);
+  mask-image: linear-gradient(to bottom, #000 82%, transparent);
+}
+.cand + .cand { border-top: 1px solid var(--line); }
+.cand-head {
+  width: 100%; min-height: 50px;
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0; border: 0; background: none;
+  text-align: left; color: var(--text); cursor: pointer;
+}
+.cand-name { flex: 1; min-width: 0; font-size: 16px; font-weight: 600; }
+.cand-dist { flex: 0 0 auto; max-width: 45%; color: var(--muted); font-size: 14px; text-align: right; }
+.cand-head[aria-expanded="true"] .chev { transform: rotate(225deg); }
+.cand-body { padding: 0 0 12px; }
+.cand-body .desc { margin-top: 0; font-size: 15px; }
+
+/* 전환 효과: 누른 카드 → 상단 제목, 본문은 아래에서 올라온다 */
+.dv-body { view-transition-name: day-body; }
+::view-transition-group(day-head) { animation-duration: 0.38s; animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
+::view-transition-old(day-head), ::view-transition-new(day-head) { height: 100%; object-fit: cover; object-position: left top; }
+::view-transition-new(day-body) { animation: dv-rise 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+::view-transition-old(day-body) { animation: dv-sink 0.24s ease both; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.3s; }
+@keyframes dv-rise { from { opacity: 0; transform: translateY(48px); } }
+@keyframes dv-sink { to { opacity: 0; transform: translateY(48px); } }
+/* 전환 효과를 지원하지 않는 브라우저 */
+.dv.dv-enter { animation: dv-fade 0.25s ease both; }
+.dv.dv-enter .dv-body { animation: dv-rise 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes dv-fade { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .gap-panel, .gap-plus, .chev { transition: none; }
+}
