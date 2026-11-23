@@ -330,7 +330,7 @@ button { font-family: inherit; }
 .info { margin: 8px 0 0; padding-top: 7px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 1px; }
 .info div { display: flex; gap: 10px; align-items: baseline; }
 .info dt { flex: 0 0 60px; color: var(--muted); font-size: 14px; }
-.info dd { flex: 1; min-width: 0; margin: 0; font-size: 15px; word-break: break-word; }
+.info dd { flex: 1; min-width: 0; margin: 0; font-size: 15px; word-break: break-word; white-space: pre-line; }
 .badge { display: inline-block; padding: 0 8px; border-radius: 999px; font-size: 13px; font-weight: 700; }
 .badge-done { background: var(--ok-bg); color: var(--ok-text); }
 .badge-need { background: var(--need-bg); color: var(--need-text); }

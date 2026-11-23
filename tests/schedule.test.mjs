@@ -6,7 +6,7 @@ import { routeHtml, SCROLL_FROM, MODES } from '../js/ui/route.js';
 import { THEN_LABELS } from '../js/ui/icons.js';
 
 const DAY_KEYS = new Set(['date', 'label', 'title', 'stay', 'stops']);
-const PLACE_KEYS = ['name', 'area', 'desc', 'fromStay', 'access', 'hours', 'price', 'reservation', 'reservationNote'];
+const PLACE_KEYS = ['name', 'area', 'desc', 'fromStay', 'access', 'hours', 'price', 'menu', 'tips', 'reservation', 'reservationNote'];
 const STOP_KEYS = new Set([...PLACE_KEYS, 'time', 'move', 'then', 'thenIcon']);
 const MOVE_KEYS = new Set(['distance', 'total', 'choose', 'steps']);
 const STEP_KEYS = new Set(['mode', 'title', 'text', 'time', 'note']);
@@ -31,7 +31,7 @@ function problems(days, stays) {
     d.stops.forEach((s, si) => {
       const sw = `${dw} ${si + 1}번째 일정(${s.name ?? '?'})`;
       checkPlace(s, sw, STOP_KEYS);
-      if (s.time !== undefined && !/^([01]\d|2[0-3]):[0-5]\d$/.test(s.time)) out.push(`${sw}: time은 '09:30' 형식`);
+      if (s.time !== undefined && !/^([01]\d|2[0-3]):[0-5]\d(~([01]\d|2[0-3]):[0-5]\d)?$/.test(s.time)) out.push(`${sw}: time은 '09:30' 또는 '21:00~22:00' 형식`);
       if (s.then !== undefined && !Array.isArray(s.then)) out.push(`${sw}: then은 목록이어야 함`);
       if (s.thenIcon !== undefined && !(s.thenIcon in THEN_LABELS)) out.push(`${sw}: thenIcon '${s.thenIcon}'는 ${Object.keys(THEN_LABELS).join('/')} 중 하나`);
       if (s.move !== undefined) {
