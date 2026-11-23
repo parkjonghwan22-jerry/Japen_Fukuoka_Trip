@@ -6,7 +6,7 @@ import { routeHtml, SCROLL_FROM, MODES } from '../js/ui/route.js';
 import { THEN_LABELS } from '../js/ui/icons.js';
 
 const DAY_KEYS = new Set(['date', 'label', 'title', 'stay', 'stops']);
-const PLACE_KEYS = ['name', 'area', 'desc', 'fromStay', 'access', 'hours', 'price', 'menu', 'tips', 'reservation', 'reservationNote'];
+const PLACE_KEYS = ['name', 'area', 'desc', 'fromStay', 'access', 'hours', 'price', 'menu', 'see', 'tips', 'reservation', 'reservationNote'];
 const STOP_KEYS = new Set([...PLACE_KEYS, 'time', 'move', 'then', 'thenIcon']);
 const MOVE_KEYS = new Set(['distance', 'total', 'choose', 'steps']);
 const STEP_KEYS = new Set(['mode', 'title', 'text', 'time', 'note']);

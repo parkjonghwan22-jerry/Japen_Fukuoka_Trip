@@ -16,6 +16,7 @@ function infoHtml(p) {
   if (p.hours) rows.push(['영업', esc(p.hours)]);
   if (p.price) rows.push(['가격', esc(p.price)]);
   if (p.menu) rows.push(['먹거리', esc(p.menu)]);
+  if (p.see) rows.push(['볼거리', esc(p.see)]);
   if (p.tips) rows.push(['참고', esc(p.tips)]);
   // 예약 값을 적지 않았으면 예약 줄을 숨긴다 (모르는 것을 '예약 없음'으로 보이지 않게)
   if (p.reservation !== undefined || p.reservationNote) {
