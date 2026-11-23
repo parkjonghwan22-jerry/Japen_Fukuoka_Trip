@@ -8,8 +8,9 @@ export const ICONS = {
   food: svg('<path d="M4 3v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V3"/><path d="M7 3v18"/><path d="M20 15V3a4.5 4.5 0 0 0-4.5 4.5V13a2 2 0 0 0 2 2H20zm0 0v6"/>'),
   cafe: svg('<path d="M4 9h12v7a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M16 10h1.5a3 3 0 0 1 0 6H16"/><path d="M7 3v2.5M10.5 3v2.5"/>'),
   shop: svg('<path d="M5.5 7h13l-1 13h-11z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/>'),
+  jazz: svg('<path d="M9 17.5V5.5l10-2v12"/><circle cx="6.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="15.5" r="2.5"/>'),
   sight: svg('<path d="M4 8h3l1.6-2.5h6.8L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.2"/>'),
 };
 
 // 후보 구간 아이콘별 접힌 줄 이름
-export const THEN_LABELS = { food: '먹을 곳', cafe: '카페', shop: '쇼핑', sight: '볼거리' };
+export const THEN_LABELS = { food: '먹을 곳', cafe: '카페', shop: '쇼핑', sight: '볼거리', jazz: '재즈바' };
