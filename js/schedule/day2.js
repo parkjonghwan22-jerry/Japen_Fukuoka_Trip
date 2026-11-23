@@ -4,5 +4,14 @@ export default {
   label: '1/1(금)',
   title: '',
   stay: 'hotelA',
-  stops: [],
+  stops: [
+    {
+      name: '라이블리 하카타점',
+      desc: '출발',
+    },
+    {
+      name: '라이블리 하카타점',
+      desc: '숙소 복귀',
+    },
+  ],
 };

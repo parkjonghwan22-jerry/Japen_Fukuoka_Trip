@@ -6,7 +6,7 @@ import { routeHtml, SCROLL_FROM, MODES } from '../js/ui/route.js';
 
 const DAY_KEYS = new Set(['date', 'label', 'title', 'stay', 'stops']);
 const STOP_KEYS = new Set(['time', 'name', 'area', 'desc', 'reservation', 'reservationNote', 'fromStay', 'move', 'then']);
-const MOVE_KEYS = new Set(['total', 'steps']);
+const MOVE_KEYS = new Set(['total', 'choose', 'steps']);
 const STEP_KEYS = new Set(['mode', 'title', 'text', 'time', 'note']);
 const CAND_KEYS = new Set(['name', 'area', 'desc', 'reservation', 'reservationNote', 'fromStay']);
 
@@ -126,4 +126,11 @@ test('이동 단계: 제목을 생략하면 수단 이름이 제목, 제목·설
   ] } }]);
   assert.match(html, /<b>도보 이동<\/b><span class="flow-time">5분<\/span>/);
   assert.match(html, /mode-procedure[\s\S]*<b>입국 수속<\/b>[\s\S]*flow-text">입국 심사/);
+});
+
+test('이동 choose: 방법 사이에 또는, 순서용 흐름이 아님', () => {
+  const html = routeHtml([{ name: 'A', move: { choose: true, steps: [{ mode: 'walk' }, { mode: 'bus' }, { mode: 'subway' }] } }]);
+  assert.equal(html.match(/flow-or/g).length, 2);
+  assert.match(html, /class="flow flow-choose"/);
+  assert.doesNotMatch(routeHtml([{ name: 'A', move: { steps: [{ mode: 'walk' }, { mode: 'bus' }] } }]), /flow-or/);
 });

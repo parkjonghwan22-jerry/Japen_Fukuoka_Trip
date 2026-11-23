@@ -402,6 +402,14 @@ button { font-family: inherit; }
 .flow-time { margin-left: auto; color: var(--primary); font-size: 14px; font-weight: 700; white-space: nowrap; }
 .flow-text { color: var(--text-2); font-size: 14.5px; white-space: pre-wrap; word-break: break-word; }
 .flow-note { color: var(--muted); font-size: 14px; }
+.flow-hint { margin: 8px 0 0; color: var(--muted); font-size: 13px; font-weight: 600; }
+.flow-choose .flow-step { padding-bottom: 0; }
+.flow-choose .flow-step::after { display: none; }
+.flow-or {
+  display: flex; align-items: center; gap: 8px;
+  margin: 6px 0; color: var(--muted); font-size: 13px;
+}
+.flow-or::before, .flow-or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 
 .cand + .cand { border-top: 1px solid var(--line); }
 .cand-head {

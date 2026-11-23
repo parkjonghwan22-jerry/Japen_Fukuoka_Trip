@@ -42,7 +42,8 @@ export const MODES = {
   subway: '지하철', train: '전철', taxi: '택시',
 };
 
-// 이동: 점 사이에 '이동 · 약 30분'만 보이고, 누르면 가는 흐름이 펼쳐진다
+// 이동: 점 사이에 '이동 · 약 30분'만 보이고, 누르면 가는 흐름이 펼쳐진다.
+// choose: true 이면 단계가 순서가 아니라 고를 수 있는 방법들 ('또는'으로 구분)
 function moveHtml(m, gi) {
   const id = `move-${gi}`;
   const flow = m.steps.map((st) => {
@@ -53,7 +54,7 @@ function moveHtml(m, gi) {
       ${st.text ? `<p class="flow-text">${esc(st.text)}</p>` : ''}
       ${st.note ? `<p class="flow-note">${esc(st.note)}</p>` : ''}
     </li>`;
-  }).join('');
+  }).join(m.choose ? '<li class="flow-or" aria-hidden="true">또는</li>' : '');
   return `
     <li class="gap gap-move">
       <button type="button" class="gap-toggle" aria-expanded="false" aria-controls="${id}">
@@ -63,7 +64,7 @@ function moveHtml(m, gi) {
       </button>
       <div class="gap-panel" id="${id}">
         <div class="gap-clip">
-          <div class="gap-box gap-scroll"><ol class="flow">${flow}</ol></div>
+          <div class="gap-box gap-scroll">${m.choose ? '<p class="flow-hint">이 중 하나로 이동</p>' : ''}<ol class="flow${m.choose ? ' flow-choose' : ''}">${flow}</ol></div>
         </div>
       </div>
     </li>`;
