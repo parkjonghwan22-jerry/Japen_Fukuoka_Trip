@@ -59,7 +59,7 @@ function moveHtml(m, gi) {
     <li class="gap gap-move">
       <button type="button" class="gap-toggle" aria-expanded="false" aria-controls="${id}">
         <span class="gap-dot" aria-hidden="true"></span>
-        <span>이동${m.total ? ` <b>${esc(m.total)}</b>` : ''}</span>
+        <span>이동${[m.distance, m.total].some(Boolean) ? ` <b>${[m.distance, m.total].filter(Boolean).map(esc).join(' · ')}</b>` : ''}</span>
         <span class="chev" aria-hidden="true"></span>
       </button>
       <div class="gap-panel" id="${id}">

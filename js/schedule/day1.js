@@ -9,8 +9,8 @@ export default {
       time: '18:50',
       name: '후쿠오카 공항',
       desc: '도착',
-      fromStay: '대중교통 22분 · 5.3km',
       move: {
+        distance: '5.3km',
         total: '약 1시간~1시간 40분',
         steps: [
           { mode: 'procedure', title: '입국 수속', text: '입국 심사 → 짐 찾기 → 세관 검사 후 입국장으로', time: '30~60분 (예상)', note: 'Visit Japan Web QR 미리 준비' },

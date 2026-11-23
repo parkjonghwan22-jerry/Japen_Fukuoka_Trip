@@ -5,8 +5,8 @@ import { DEMO_DAYS, DEMO_STAYS } from '../js/schedule/demo.js';
 import { routeHtml, SCROLL_FROM, MODES } from '../js/ui/route.js';
 
 const DAY_KEYS = new Set(['date', 'label', 'title', 'stay', 'stops']);
-const STOP_KEYS = new Set(['time', 'name', 'area', 'desc', 'reservation', 'reservationNote', 'fromStay', 'move', 'then']);
-const MOVE_KEYS = new Set(['total', 'choose', 'steps']);
+const STOP_KEYS = new Set(['time', 'name', 'area', 'desc', 'reservation', 'reservationNote', 'move', 'then']);
+const MOVE_KEYS = new Set(['distance', 'total', 'choose', 'steps']);
 const STEP_KEYS = new Set(['mode', 'title', 'text', 'time', 'note']);
 const CAND_KEYS = new Set(['name', 'area', 'desc', 'reservation', 'reservationNote', 'fromStay']);
 
@@ -133,4 +133,10 @@ test('이동 choose: 방법 사이에 또는, 순서용 흐름이 아님', () =>
   assert.equal(html.match(/flow-or/g).length, 2);
   assert.match(html, /class="flow flow-choose"/);
   assert.doesNotMatch(routeHtml([{ name: 'A', move: { steps: [{ mode: 'walk' }, { mode: 'bus' }] } }]), /flow-or/);
+});
+
+test('이동 접힌 줄: 거리 · 총 시간', () => {
+  const html = routeHtml([{ name: 'A', move: { distance: '5.3km', total: '약 1시간', steps: [{ mode: 'walk' }] } }]);
+  assert.match(html, /이동 <b>5\.3km · 약 1시간<\/b>/);
+  assert.match(routeHtml([{ name: 'A', move: { steps: [{ mode: 'walk' }] } }]), /<span>이동<\/span>/);
 });

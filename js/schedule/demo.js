@@ -14,9 +14,9 @@ export const DEMO_DAYS = [
   {
     date: '2026-12-31', label: '12/31(목)', title: '도착 · 나카스 야타이', stay: 'hotelA',
     stops: [
-      { time: '17:30', name: '후쿠오카 공항 도착', area: '국제선 터미널', desc: '입국 심사 후 지하철로 이동', fromStay: '지하철 10분', reservation: 'none',
+      { time: '17:30', name: '후쿠오카 공항 도착', area: '국제선 터미널', desc: '입국 심사 후 지하철로 이동', reservation: 'none',
         then: [cand('공항 편의점', '공항 안')] },
-      { time: '19:00', name: '숙소 체크인', area: '하카타역 근처', fromStay: '-', reservation: 'done', reservationNote: '예약번호 0000',
+      { time: '19:00', name: '숙소 체크인', area: '하카타역 근처', reservation: 'done', reservationNote: '예약번호 0000',
         then: [
           cand('캐널시티 하카타', '도보 15분 · 1.1km'),
           cand('쿠시다 신사', '도보 12분 · 900m', { reservation: 'none' }),
@@ -25,20 +25,20 @@ export const DEMO_DAYS = [
           cand('돈키호테 나카스', '도보 14분 · 1km'),
           cand('스미요시 신사', '도보 10분 · 800m'),
         ] },
-      { time: '21:00', name: '나카스 야타이 거리', area: '나카스 강변', desc: '연말이라 영업 여부 확인 필요\n현금 준비', fromStay: '도보 15분 · 1.2km', reservation: 'none' },
+      { time: '21:00', name: '나카스 야타이 거리', area: '나카스 강변', desc: '연말이라 영업 여부 확인 필요\n현금 준비', reservation: 'none' },
     ],
   },
   {
     date: '2027-01-01', label: '1/1(금)', title: '다자이후 하츠모데', stay: 'hotelA',
     stops: [
-      { time: '09:00', name: '다자이후 텐만구', area: '다자이후시', desc: '새해 참배 인파가 많으므로 아침 일찍 출발', fromStay: '전철 40분', reservation: 'none',
+      { time: '09:00', name: '다자이후 텐만구', area: '다자이후시', desc: '새해 참배 인파가 많으므로 아침 일찍 출발', reservation: 'none',
         then: [cand('참배길 떡집 (예시)', '전철 40분'), cand('규슈 국립박물관', '전철 45분')] },
-      { time: '14:00', name: '텐진 지하상가', area: '텐진', fromStay: '지하철 5분', reservation: 'none' },
+      { time: '14:00', name: '텐진 지하상가', area: '텐진', reservation: 'none' },
     ],
   },
   { date: '2027-01-02', label: '1/2(토)', title: '유후인 료칸', stay: 'ryokan',
-    stops: [{ time: '15:00', name: '료칸 체크인', area: '유후인', fromStay: '-', reservation: 'done', reservationNote: '석식 18시' }] },
+    stops: [{ time: '15:00', name: '료칸 체크인', area: '유후인', reservation: 'done', reservationNote: '석식 18시' }] },
   { date: '2027-01-03', label: '1/3(일)', title: '', stay: 'hotelB', stops: [] },
   { date: '2027-01-04', label: '1/4(월)', title: '귀국', stay: null,
-    stops: [{ time: '11:00', name: '후쿠오카 공항 출국', fromStay: '지하철 15분' }] },
+    stops: [{ time: '11:00', name: '후쿠오카 공항 출국' }] },
 ];

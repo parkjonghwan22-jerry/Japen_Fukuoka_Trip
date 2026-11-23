@@ -9,6 +9,7 @@ export default {
       name: '라이블리 하카타점',
       desc: '체크아웃',
       move: {
+        distance: '약 1.5km',
         total: '10~20분',
         choose: true,
         steps: [
@@ -20,7 +21,6 @@ export default {
     },
     {
       name: '하카타 버스터미널',
-      fromStay: '약 1.5km · 대중교통 10~15분 · 도보 18~20분',
     },
   ],
 };
