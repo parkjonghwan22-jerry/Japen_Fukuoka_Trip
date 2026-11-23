@@ -36,6 +36,28 @@ function stopHtml(s) {
     </li>`;
 }
 
+// 이동 수단 표시
+export const MODES = { walk: '도보', bus: '버스', shuttle: '셔틀', subway: '지하철', train: '전철', taxi: '택시' };
+
+function moveHtml(m) {
+  const steps = m.steps.map((st) => `
+    <li class="step">
+      <span class="mode mode-${MODES[st.mode] ? st.mode : 'walk'}">${MODES[st.mode] ?? esc(st.mode)}</span>
+      <div class="step-text">
+        <p class="step-route">${esc(st.from)} <span class="arrow" aria-label="에서">→</span> ${esc(st.to)}</p>
+        ${st.note ? `<p class="step-note">${esc(st.note)}</p>` : ''}
+      </div>
+      ${st.time ? `<span class="step-time">${esc(st.time)}</span>` : ''}
+    </li>`).join('');
+  return `
+    <li class="move">
+      <section class="move-card" aria-label="이동 방법">
+        <p class="move-head"><span>이동</span>${m.total ? ` <b>${esc(m.total)}</b>` : ''}</p>
+        <ol class="steps">${steps}</ol>
+      </section>
+    </li>`;
+}
+
 function candHtml(c, id) {
   return `
     <li class="cand">
@@ -75,6 +97,7 @@ export function routeHtml(stops) {
   const parts = [];
   stops.forEach((s, i) => {
     parts.push(stopHtml(s));
+    if (s.move?.steps?.length) parts.push(moveHtml(s.move));
     if (Array.isArray(s.then) && s.then.length) parts.push(gapHtml(s.then, i));
   });
   return `<ol class="route">${parts.join('')}</ol>`;

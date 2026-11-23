@@ -2,10 +2,12 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DAYS, STAYS, RESERVATION } from '../js/schedule/index.js';
 import { DEMO_DAYS, DEMO_STAYS } from '../js/schedule/demo.js';
-import { routeHtml, SCROLL_FROM } from '../js/ui/route.js';
+import { routeHtml, SCROLL_FROM, MODES } from '../js/ui/route.js';
 
 const DAY_KEYS = new Set(['date', 'label', 'title', 'stay', 'stops']);
-const STOP_KEYS = new Set(['time', 'name', 'area', 'desc', 'reservation', 'reservationNote', 'fromStay', 'then']);
+const STOP_KEYS = new Set(['time', 'name', 'area', 'desc', 'reservation', 'reservationNote', 'fromStay', 'move', 'then']);
+const MOVE_KEYS = new Set(['total', 'steps']);
+const STEP_KEYS = new Set(['mode', 'from', 'to', 'time', 'note']);
 const CAND_KEYS = new Set(['name', 'area', 'desc', 'reservation', 'reservationNote', 'fromStay']);
 
 // 손으로 입력한 일정 데이터의 실수(오타 난 항목 이름, 빠진 이름, 잘못된 값)를 찾는다
@@ -29,6 +31,16 @@ function problems(days, stays) {
       checkPlace(s, sw, STOP_KEYS);
       if (s.time !== undefined && !/^([01]\d|2[0-3]):[0-5]\d$/.test(s.time)) out.push(`${sw}: time은 '09:30' 형식`);
       if (s.then !== undefined && !Array.isArray(s.then)) out.push(`${sw}: then은 목록이어야 함`);
+      if (s.move !== undefined) {
+        for (const k of Object.keys(s.move)) if (!MOVE_KEYS.has(k)) out.push(`${sw} 이동: 모르는 항목 '${k}'`);
+        if (!Array.isArray(s.move.steps) || !s.move.steps.length) out.push(`${sw} 이동: steps가 비어 있음`);
+        (s.move.steps ?? []).forEach((st, ti) => {
+          const tw = `${sw} 이동 ${ti + 1}단계`;
+          for (const k of Object.keys(st)) if (!STEP_KEYS.has(k)) out.push(`${tw}: 모르는 항목 '${k}'`);
+          if (!(st.mode in MODES)) out.push(`${tw}: mode '${st.mode}'는 ${Object.keys(MODES).join('/')} 중 하나`);
+          if (!st.from || !st.to) out.push(`${tw}: from/to가 비어 있음`);
+        });
+      }
       (s.then ?? []).forEach((c, ci) => checkPlace(c, `${sw} 후보 ${ci + 1}(${c.name ?? '?'})`, CAND_KEYS));
     });
   });
@@ -56,7 +68,10 @@ test('검사기는 오타와 빠진 값을 잡는다', () => {
   const bad = [{ date: 'x', label: 'x', stay: 'nope', stops: [
     { name: '', resevation: 'done', time: '9:00', then: [{ name: 'A', reservation: 'yes' }] },
   ] }];
+  bad[0].stops.push({ name: 'B', move: { steps: [{ mode: 'car', from: 'A' }] } });
   const p = problems(bad, {});
+  assert.ok(p.some((m) => m.includes("mode 'car'")));
+  assert.ok(p.some((m) => m.includes('from/to')));
   assert.ok(p.some((m) => m.includes("숙소 'nope'")));
   assert.ok(p.some((m) => m.includes("모르는 항목 'resevation'")));
   assert.ok(p.some((m) => m.includes('name이 비어')));
@@ -90,4 +105,15 @@ test('노선: 예약 값을 적지 않으면 예약 줄을 숨기고, none이면
 
 test('일정이 비어 있으면 안내 문구', () => {
   assert.match(routeHtml([]), /아직 일정이 없습니다/);
+});
+
+test('노선: 이동 카드는 일정 바로 뒤, 후보 구간보다 앞에 온다', () => {
+  const html = routeHtml([
+    { name: 'A', move: { total: '약 30분', steps: [{ mode: 'subway', from: 'X역', to: 'Y역', time: '8분' }] }, then: [{ name: 'a1' }] },
+    { name: 'B' },
+  ]);
+  const order = [...html.matchAll(/class="(stop|move|gap)"/g)].map((m) => m[1]);
+  assert.deepEqual(order, ['stop', 'move', 'gap', 'stop']);
+  assert.match(html, /mode-subway">지하철/);
+  assert.match(html, /약 30분/);
 });

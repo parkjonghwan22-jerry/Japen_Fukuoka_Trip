@@ -14,8 +14,13 @@
 //     reservation: 'done',               'done' 예약 완료 | 'need' 예약 필요 | 'none' 예약 없음 (생략하면 예약 줄을 숨김)
 //     reservationNote: '예약번호 1234',   예약 관련 메모
 //     fromStay: '지하철 40분 · 14km',     숙소로부터 거리 (적은 그대로 표시)
+//     move: { total: '약 30분', steps: [ 이동 단계, ... ] },   다음 일정까지 가는 방법
 //     then: [ 후보, ... ],                이 일정과 다음 일정 사이에 갈 만한 곳
 //   }
+//
+// 이동 단계
+//   { mode: 'subway', from: '후쿠오카 공항역', to: '나카스카와바타역', time: '8~10분', note: '...' }
+//   mode: walk 도보 | bus 버스 | shuttle 셔틀 | subway 지하철 | train 전철 | taxi 택시
 //
 // 후보: 핵심 일정과 같은 항목에서 time, then만 뺀 것
 
