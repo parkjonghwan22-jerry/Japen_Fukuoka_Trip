@@ -7,7 +7,7 @@ import { routeHtml, SCROLL_FROM, MODES } from '../js/ui/route.js';
 const DAY_KEYS = new Set(['date', 'label', 'title', 'stay', 'stops']);
 const STOP_KEYS = new Set(['time', 'name', 'area', 'desc', 'reservation', 'reservationNote', 'fromStay', 'move', 'then']);
 const MOVE_KEYS = new Set(['total', 'steps']);
-const STEP_KEYS = new Set(['mode', 'text', 'time', 'note']);
+const STEP_KEYS = new Set(['mode', 'title', 'text', 'time', 'note']);
 const CAND_KEYS = new Set(['name', 'area', 'desc', 'reservation', 'reservationNote', 'fromStay']);
 
 // 손으로 입력한 일정 데이터의 실수(오타 난 항목 이름, 빠진 이름, 잘못된 값)를 찾는다
@@ -38,7 +38,7 @@ function problems(days, stays) {
           const tw = `${sw} 이동 ${ti + 1}단계`;
           for (const k of Object.keys(st)) if (!STEP_KEYS.has(k)) out.push(`${tw}: 모르는 항목 '${k}'`);
           if (!(st.mode in MODES)) out.push(`${tw}: mode '${st.mode}'는 ${Object.keys(MODES).join('/')} 중 하나`);
-          if (typeof st.text !== 'string' || !st.text.trim()) out.push(`${tw}: text가 비어 있음`);
+          if (!st.title && !st.text) out.push(`${tw}: title이나 text가 비어 있음`);
         });
       }
       (s.then ?? []).forEach((c, ci) => checkPlace(c, `${sw} 후보 ${ci + 1}(${c.name ?? '?'})`, CAND_KEYS));
@@ -71,7 +71,7 @@ test('검사기는 오타와 빠진 값을 잡는다', () => {
   bad[0].stops.push({ name: 'B', move: { steps: [{ mode: 'car' }] } });
   const p = problems(bad, {});
   assert.ok(p.some((m) => m.includes("mode 'car'")));
-  assert.ok(p.some((m) => m.includes('text가 비어')));
+  assert.ok(p.some((m) => m.includes('title이나 text')));
   assert.ok(p.some((m) => m.includes("숙소 'nope'")));
   assert.ok(p.some((m) => m.includes("모르는 항목 'resevation'")));
   assert.ok(p.some((m) => m.includes('name이 비어')));
@@ -117,4 +117,13 @@ test('노선: 이동 카드는 일정 바로 뒤, 후보 구간보다 앞에 온
   assert.match(html, /flow-step mode-subway/);
   assert.match(html, /이동 <b>약 30분<\/b>/);
   assert.match(html, /gap-box gap-scroll"><ol class="flow"/); // 이동은 항상 높이 제한 + 스크롤
+});
+
+test('이동 단계: 제목을 생략하면 수단 이름이 제목, 제목·설명·시간 순서로 보인다', () => {
+  const html = routeHtml([{ name: 'A', move: { steps: [
+    { mode: 'walk', text: '역까지', time: '5분' },
+    { mode: 'procedure', title: '입국 수속', text: '입국 심사' },
+  ] } }]);
+  assert.match(html, /<b>도보 이동<\/b><span class="flow-time">5분<\/span>/);
+  assert.match(html, /mode-procedure[\s\S]*<b>입국 수속<\/b>[\s\S]*flow-text">입국 심사/);
 });

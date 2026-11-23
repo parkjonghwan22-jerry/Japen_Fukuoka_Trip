@@ -36,17 +36,24 @@ function stopHtml(s) {
     </li>`;
 }
 
-// 이동 수단 (흐름 속 작은 점 색으로 구분)
-export const MODES = { walk: '도보', bus: '버스', shuttle: '셔틀', subway: '지하철', train: '전철', taxi: '택시' };
+// 이동 수단 (흐름 속 작은 점 색으로 구분). 단계에 title이 없으면 이 이름을 제목으로 쓴다.
+export const MODES = {
+  procedure: '수속', walk: '도보 이동', bus: '버스', shuttle: '셔틀버스',
+  subway: '지하철', train: '전철', taxi: '택시',
+};
 
 // 이동: 점 사이에 '이동 · 약 30분'만 보이고, 누르면 가는 흐름이 펼쳐진다
 function moveHtml(m, gi) {
   const id = `move-${gi}`;
-  const flow = m.steps.map((st) => `
-    <li class="flow-step mode-${MODES[st.mode] ? st.mode : 'walk'}">
-      <p>${esc(st.text)}${st.time ? ` <span class="flow-time">${esc(st.time)}</span>` : ''}</p>
+  const flow = m.steps.map((st) => {
+    const mode = MODES[st.mode] ? st.mode : 'walk';
+    return `
+    <li class="flow-step mode-${mode}">
+      <p class="flow-title"><b>${esc(st.title || MODES[mode])}</b>${st.time ? `<span class="flow-time">${esc(st.time)}</span>` : ''}</p>
+      ${st.text ? `<p class="flow-text">${esc(st.text)}</p>` : ''}
       ${st.note ? `<p class="flow-note">${esc(st.note)}</p>` : ''}
-    </li>`).join('');
+    </li>`;
+  }).join('');
   return `
     <li class="gap gap-move">
       <button type="button" class="gap-toggle" aria-expanded="false" aria-controls="${id}">

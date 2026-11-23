@@ -395,9 +395,13 @@ button { font-family: inherit; }
 .flow-step.mode-subway::before, .flow-step.mode-train::before { background: #1f3a5f; }
 .flow-step.mode-bus::before, .flow-step.mode-shuttle::before { background: #1b7a43; }
 .flow-step.mode-taxi::before { background: #c28a00; }
-.flow-step p { margin: 0; font-size: 15px; color: var(--text); }
-.flow-time { color: var(--primary); font-size: 14px; font-weight: 700; white-space: nowrap; }
-.flow-note { color: var(--muted); font-size: 14px !important; }
+.flow-step.mode-procedure::before { background: #c8423b; }
+.flow-step p { margin: 0; }
+.flow-title { display: flex; align-items: baseline; gap: 8px; }
+.flow-title b { font-size: 15px; font-weight: 700; color: var(--text); }
+.flow-time { margin-left: auto; color: var(--primary); font-size: 14px; font-weight: 700; white-space: nowrap; }
+.flow-text { color: var(--text-2); font-size: 14.5px; white-space: pre-wrap; word-break: break-word; }
+.flow-note { color: var(--muted); font-size: 14px; }
 
 .cand + .cand { border-top: 1px solid var(--line); }
 .cand-head {

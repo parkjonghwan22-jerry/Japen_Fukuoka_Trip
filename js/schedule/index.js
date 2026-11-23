@@ -19,10 +19,9 @@
 //   }
 //
 // 이동 단계
-//   { mode: 'subway', text: '지하철을 타고 나카스카와바타역까지', time: '8~10분', note: '...' }
-//   mode: walk 도보 | bus 버스 | shuttle 셔틀 | subway 지하철 | train 전철 | taxi 택시
-//
-// 후보: 핵심 일정과 같은 항목에서 time, then만 뺀 것
+//   { mode: 'subway', title: '지하철', text: '나카스카와바타역까지', time: '8~10분', note: '...' }
+//   mode: procedure 수속 | walk 도보 이동 | bus 버스 | shuttle 셔틀버스 | subway 지하철 | train 전철 | taxi 택시
+//   title을 생략하면 mode 이름이 제목이 된다
 
 import day1 from './day1.js';
 import day2 from './day2.js';

@@ -11,12 +11,13 @@ export default {
       desc: '도착',
       fromStay: '대중교통 22분 · 5.3km',
       move: {
-        total: '약 30~40분',
+        total: '약 1시간~1시간 40분',
         steps: [
-          { mode: 'shuttle', text: '국제선 터미널에서 무료 셔틀버스를 타고 국내선 터미널로', time: '10~15분', note: '배차 10~15분' },
-          { mode: 'walk', text: '지하로 내려가 후쿠오카 공항역까지 걸어서', time: '5~10분' },
-          { mode: 'subway', text: '지하철을 타고 나카스카와바타역까지', time: '8~10분' },
-          { mode: 'walk', text: '역에서 숙소까지 걸어서', time: '5분 안팎' },
+          { mode: 'procedure', title: '입국 수속', text: '입국 심사 → 짐 찾기 → 세관 검사 후 입국장으로', time: '30~60분 (예상)', note: 'Visit Japan Web QR 미리 준비' },
+          { mode: 'shuttle', title: '무료 셔틀버스', text: '국제선 터미널에서 국내선 터미널로', time: '10~15분', note: '배차 10~15분' },
+          { mode: 'walk', title: '도보 이동', text: '지하로 내려가 후쿠오카 공항역까지', time: '5~10분' },
+          { mode: 'subway', title: '지하철', text: '후쿠오카 공항역에서 나카스카와바타역까지', time: '8~10분' },
+          { mode: 'walk', title: '도보 이동', text: '역에서 숙소까지', time: '5분 안팎' },
         ],
       },
     },
