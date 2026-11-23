@@ -38,32 +38,34 @@ function build(day, index, stayName) {
   return root;
 }
 
+// 펼치고 접는 곳: 이동 구간, 후보 구간, 세부 정보가 있는 일정 카드 (한 번에 하나만 열린다)
 function setupGaps(root) {
   const body = root.querySelector('.dv-body');
-  const gaps = [...root.querySelectorAll('.gap')];
+  const folds = [...root.querySelectorAll('[data-fold]')];
+  const toggleOf = (f) => f.querySelector('[data-fold-toggle]');
 
-  const setOpen = (gap, open) => {
-    gap.classList.toggle('open', open);
-    gap.querySelector('.gap-toggle').setAttribute('aria-expanded', String(open));
+  const setOpen = (f, open) => {
+    f.classList.toggle('open', open);
+    toggleOf(f).setAttribute('aria-expanded', String(open));
   };
 
-  for (const gap of gaps) {
-    gap.querySelector('.gap-toggle').addEventListener('click', () => {
-      const open = !gap.classList.contains('open');
-      for (const g of gaps) if (g !== gap) setOpen(g, false); // 한 번에 한 구간만
-      setOpen(gap, open);
+  for (const f of folds) {
+    toggleOf(f).addEventListener('click', () => {
+      const open = !f.classList.contains('open');
+      for (const g of folds) if (g !== f) setOpen(g, false);
+      setOpen(f, open);
       if (open) {
-        // 펼쳐지는 애니메이션이 끝난 뒤 구간이 화면 안에 들어오게
-        setTimeout(() => gap.scrollIntoView({ block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' }), 320);
+        // 펼쳐지는 애니메이션이 끝난 뒤 화면 안에 들어오게
+        setTimeout(() => f.scrollIntoView({ block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' }), 320);
       }
     });
 
     // 따로 스크롤되는 영역: 끝에 닿기 전까지 아래쪽을 흐리게 해서 "더 있다"를 보여준다
-    const list = gap.querySelector('.gap-scroll');
+    const list = f.querySelector('.gap-scroll');
     if (list) {
       const mark = () => list.classList.toggle('at-end', list.scrollTop + list.clientHeight >= list.scrollHeight - 4);
       list.addEventListener('scroll', mark, { passive: true });
-      gap.querySelector('.gap-toggle').addEventListener('click', () => requestAnimationFrame(mark));
+      toggleOf(f).addEventListener('click', () => requestAnimationFrame(mark));
     }
   }
 

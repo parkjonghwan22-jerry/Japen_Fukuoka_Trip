@@ -11,7 +11,13 @@
 //     name: '다자이후 텐만구',
 //     area: '다자이후시',                 위치
 //     desc: '오전 일찍 가기',              설명 (줄바꿈은 \n)
-//     reservation: 'done',               'done' 예약 완료 | 'need' 예약 필요 | 'none' 예약 없음 (생략하면 예약 줄을 숨김)
+//     fromStay: '1.5km',                 숙소에서 거리
+//     access: '대중교통 10~15분 · 도보 20분', 가는 법
+//     hours: '23시까지',                  영업시간
+//     price: '디너 2,000~3,000엔',         가격
+//     reservation: 'done',               done 예약 완료 | ok 예약 가능 | need 예약 필요 | no 예약 불가 | none 예약 없음
+//                                         (생략하면 예약 줄을 숨김)
+//     ※ 위치·거리·영업·가격·예약이 있으면 카드를 눌러 펼쳐 본다
 //     reservationNote: '예약번호 1234',   예약 관련 메모
 //     move: { distance: '5.3km', total: '약 30분', steps: [ 이동 단계, ... ] },
 //                                          다음 일정까지 가는 방법 (거리·총 시간은 접힌 줄에 표시)
@@ -35,4 +41,6 @@ import day5 from './day5.js';
 export { STAYS } from './stays.js';
 export const DAYS = [day1, day2, day3, day4, day5];
 
-export const RESERVATION = { done: '예약 완료', need: '예약 필요', none: '예약 없음' };
+export const RESERVATION = {
+  done: '예약 완료', ok: '예약 가능', need: '예약 필요', no: '예약 불가', none: '예약 없음',
+};

@@ -315,6 +315,16 @@ button { font-family: inherit; }
 }
 .stop-time { margin: 0; color: var(--primary); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .stop-name { margin: 0; font-size: 18px; font-weight: 700; }
+.stop-head {
+  width: 100%; display: flex; align-items: center; gap: 10px;
+  padding: 0; border: 0; background: none;
+  text-align: left; color: inherit; font: inherit; cursor: pointer;
+}
+.stop-head-text { flex: 1; min-width: 0; display: block; }
+.stop-head .chev { transform: rotate(45deg); }
+.stop.open .stop-head .chev { transform: rotate(225deg); }
+.stop-detail .info { margin-top: 8px; }
+.stop-detail.gap-scroll { max-height: min(34dvh, 240px); }
 .desc { margin: 2px 0 0; color: var(--text-2); font-size: 15px; white-space: pre-wrap; word-break: break-word; }
 
 .info { margin: 8px 0 0; padding-top: 7px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 1px; }
@@ -325,6 +335,8 @@ button { font-family: inherit; }
 .badge-done { background: var(--ok-bg); color: var(--ok-text); }
 .badge-need { background: var(--need-bg); color: var(--need-text); }
 .badge-none { background: var(--subtle); color: var(--muted); }
+.badge-ok { background: #e8eef8; color: #1f3a5f; }
+.badge-no { background: #fdecec; color: #c92a2a; }
 .resv-note { color: var(--text-2); font-size: 14px; }
 
 /* 점과 점 사이 (이동 / 후보): 접혀 있다가 누르면 위아래로 벌어진다 */
@@ -360,12 +372,13 @@ button { font-family: inherit; }
 .gap-empty { padding: 12px 14px; color: var(--muted); font-size: 15px; }
 .gap.open .gap-toggle .chev { transform: rotate(225deg); }
 
-.gap-panel {
+.fold-panel {
   display: grid; grid-template-rows: 0fr;
-  margin-left: 38px;
   transition: grid-template-rows 0.3s ease;
 }
-.gap.open .gap-panel { grid-template-rows: 1fr; padding-bottom: 6px; }
+.open > .fold-panel, .open > .stop-card > .fold-panel { grid-template-rows: 1fr; }
+.gap-panel { margin-left: 38px; }
+.gap.open .gap-panel { padding-bottom: 6px; }
 .gap-clip { min-height: 0; overflow: hidden; }
 .gap-box {
   margin: 0; padding: 4px 14px;
@@ -442,5 +455,5 @@ button { font-family: inherit; }
 .dv.dv-enter .dv-body { animation: dv-rise 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
 @keyframes dv-fade { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
-  .gap-panel, .gap-plus, .gap-icon, .chev { transition: none; }
+  .fold-panel, .gap-plus, .gap-icon, .chev { transition: none; }
 }

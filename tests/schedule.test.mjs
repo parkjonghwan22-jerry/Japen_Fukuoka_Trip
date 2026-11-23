@@ -6,10 +6,11 @@ import { routeHtml, SCROLL_FROM, MODES } from '../js/ui/route.js';
 import { THEN_LABELS } from '../js/ui/icons.js';
 
 const DAY_KEYS = new Set(['date', 'label', 'title', 'stay', 'stops']);
-const STOP_KEYS = new Set(['time', 'name', 'area', 'desc', 'reservation', 'reservationNote', 'move', 'then', 'thenIcon']);
+const PLACE_KEYS = ['name', 'area', 'desc', 'fromStay', 'access', 'hours', 'price', 'reservation', 'reservationNote'];
+const STOP_KEYS = new Set([...PLACE_KEYS, 'time', 'move', 'then', 'thenIcon']);
 const MOVE_KEYS = new Set(['distance', 'total', 'choose', 'steps']);
 const STEP_KEYS = new Set(['mode', 'title', 'text', 'time', 'note']);
-const CAND_KEYS = new Set(['name', 'area', 'desc', 'reservation', 'reservationNote', 'fromStay']);
+const CAND_KEYS = new Set(PLACE_KEYS);
 
 // 손으로 입력한 일정 데이터의 실수(오타 난 항목 이름, 빠진 이름, 잘못된 값)를 찾는다
 function problems(days, stays) {
@@ -17,8 +18,8 @@ function problems(days, stays) {
   const checkPlace = (p, where, allowed) => {
     for (const k of Object.keys(p)) if (!allowed.has(k)) out.push(`${where}: 모르는 항목 '${k}'`);
     if (typeof p.name !== 'string' || !p.name.trim()) out.push(`${where}: name이 비어 있음`);
-    if (p.reservation !== undefined && !(p.reservation in RESERVATION)) out.push(`${where}: reservation '${p.reservation}'은 done/need/none 중 하나여야 함`);
-    for (const k of ['area', 'desc', 'reservationNote', 'fromStay']) {
+    if (p.reservation !== undefined && !(p.reservation in RESERVATION)) out.push(`${where}: reservation '${p.reservation}'은 ${Object.keys(RESERVATION).join('/')} 중 하나여야 함`);
+    for (const k of PLACE_KEYS.filter((k) => k !== 'name' && k !== 'reservation')) {
       if (p[k] != null && typeof p[k] !== 'string') out.push(`${where}: ${k}는 글자여야 함`);
     }
   };
@@ -102,6 +103,7 @@ test('노선: 예약 값을 적지 않으면 예약 줄을 숨기고, none이면
   assert.doesNotMatch(routeHtml([{ name: 'A', area: '하카타' }]), /badge/);
   assert.doesNotMatch(routeHtml([{ name: 'A' }]), /class="info"/);
   assert.match(routeHtml([{ name: 'A', reservation: 'none' }]), /badge-none">예약 없음/);
+  assert.match(routeHtml([{ name: 'A', reservation: 'ok' }]), /badge-ok">예약 가능/);
   assert.match(routeHtml([{ name: 'A', reservationNote: '18시' }]), /badge-none/);
 });
 
@@ -154,4 +156,13 @@ test('후보 구간 아이콘: 0곳이어도 구간이 생기고 이름이 바�
 
 test('이동 구간은 자동차 아이콘', () => {
   assert.match(routeHtml([{ name: 'A', move: { steps: [{ mode: 'walk' }] } }]), /gap-move[\s\S]*gap-icon"><svg/);
+});
+
+test('일정 카드: 세부 정보가 있으면 눌러서 펼치는 카드, 없으면 그냥 카드', () => {
+  const rich = routeHtml([{ name: 'A', hours: '23시까지', price: '2,000엔', reservation: 'no' }]);
+  assert.match(rich, /class="stop stop-fold" data-fold/);
+  assert.match(rich, /stop-detail gap-scroll/);
+  assert.match(rich, /영업<\/dt><dd>23시까지/);
+  assert.match(rich, /badge-no">예약 불가/);
+  assert.doesNotMatch(routeHtml([{ name: 'B', desc: '체크인' }]), /data-fold/);
 });
