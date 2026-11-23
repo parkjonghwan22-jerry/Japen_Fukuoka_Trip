@@ -58,8 +58,8 @@ function setupGaps(root) {
       }
     });
 
-    // 스크롤 목록: 끝에 닿기 전까지 아래쪽을 흐리게 해서 "더 있다"를 보여준다
-    const list = gap.querySelector('.cands.scroll');
+    // 따로 스크롤되는 영역: 끝에 닿기 전까지 아래쪽을 흐리게 해서 "더 있다"를 보여준다
+    const list = gap.querySelector('.gap-scroll');
     if (list) {
       const mark = () => list.classList.toggle('at-end', list.scrollTop + list.clientHeight >= list.scrollHeight - 4);
       list.addEventListener('scroll', mark, { passive: true });

@@ -292,75 +292,49 @@ button { font-family: inherit; }
 .route-empty { margin: 8px 4px; color: var(--muted); font-size: 16px; }
 
 /* 노선: 왼쪽 세로선 + 점 */
-.route { list-style: none; margin: 0; padding: 0; }
+.route { list-style: none; margin: 0; padding: 0; line-height: 1.45; }
 .route > li { position: relative; padding-left: 38px; }
 .route > li::before {
   content: ""; position: absolute; left: 13px; top: 0; bottom: 0;
   width: 3px; background: var(--route);
 }
-.route > li:first-child::before { top: 26px; }
-.route > li:last-child::before { bottom: auto; height: 26px; }
+.route > li:first-child::before { top: 24px; }
+.route > li:last-child::before { bottom: auto; height: 24px; }
 .route > li:only-child::before { display: none; }
-.route > .gap:last-child::before { height: 22px; }
-.stop { padding-bottom: 14px; }
+.route > .gap:last-child::before { height: 20px; }
+.stop { padding-bottom: 6px; }
 .stop-dot {
-  position: absolute; left: 5px; top: 17px;
+  position: absolute; left: 5px; top: 15px;
   width: 19px; height: 19px; border-radius: 50%;
   background: #fff; border: 4px solid var(--route);
   z-index: 1;
 }
 .stop-card {
-  padding: 14px 16px; border-radius: 16px;
+  padding: 11px 14px; border-radius: 16px;
   background: #fff; box-shadow: 0 1px 3px rgba(25, 31, 40, 0.07);
 }
-.stop-time { margin: 0; color: var(--primary); font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
-.stop-name { margin: 0; font-size: 19px; font-weight: 700; line-height: 1.4; }
-.desc { margin: 6px 0 0; color: var(--text-2); font-size: 16px; white-space: pre-wrap; word-break: break-word; }
+.stop-time { margin: 0; color: var(--primary); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stop-name { margin: 0; font-size: 18px; font-weight: 700; }
+.desc { margin: 2px 0 0; color: var(--text-2); font-size: 15px; white-space: pre-wrap; word-break: break-word; }
 
-.info { margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; }
+.info { margin: 8px 0 0; padding-top: 7px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 1px; }
 .info div { display: flex; gap: 10px; align-items: baseline; }
-.info dt { flex: 0 0 64px; color: var(--muted); font-size: 14px; }
+.info dt { flex: 0 0 60px; color: var(--muted); font-size: 14px; }
 .info dd { flex: 1; min-width: 0; margin: 0; font-size: 15px; word-break: break-word; }
-.badge { display: inline-block; padding: 1px 9px; border-radius: 999px; font-size: 13px; font-weight: 700; }
+.badge { display: inline-block; padding: 0 8px; border-radius: 999px; font-size: 13px; font-weight: 700; }
 .badge-done { background: var(--ok-bg); color: var(--ok-text); }
 .badge-need { background: var(--need-bg); color: var(--need-text); }
 .badge-none { background: var(--subtle); color: var(--muted); }
 .resv-note { color: var(--text-2); font-size: 14px; }
 
-/* 이동 카드: 일정과 다음 일정 사이, 가는 방법 */
-.move { padding-bottom: 14px; }
-.route > .move::before { background: repeating-linear-gradient(to bottom, var(--route) 0 6px, transparent 6px 11px); }
-.move-card {
-  padding: 12px 14px; border-radius: 14px;
-  background: #fff; border: 1px solid var(--line);
-}
-.move-head { margin: 0 0 6px; color: var(--muted); font-size: 14px; font-weight: 600; }
-.move-head b { color: var(--text); font-size: 15px; }
-.steps { list-style: none; margin: 0; padding: 0; }
-.step { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; }
-.step + .step { border-top: 1px solid var(--line); }
-.mode {
-  flex: 0 0 52px; padding: 2px 0; border-radius: 8px;
-  text-align: center; font-size: 13px; font-weight: 700;
-  background: var(--subtle); color: var(--text-2);
-}
-.mode-subway { background: #e8eef8; color: #1f3a5f; }
-.mode-train { background: #e8eef8; color: #1f3a5f; }
-.mode-bus, .mode-shuttle { background: #e9f5ee; color: #1b7a43; }
-.mode-taxi { background: #fff6dc; color: #7a5600; }
-.step-text { flex: 1; min-width: 0; }
-.step-route { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.45; }
-.arrow { color: var(--muted); font-weight: 400; }
-.step-note { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
-.step-time { flex: 0 0 auto; color: var(--primary); font-size: 14px; font-weight: 700; white-space: nowrap; }
-
-/* 점과 점 사이: 누르면 위아래로 펼쳐지는 후보 목록 */
-.gap { padding-bottom: 14px; }
+/* 점과 점 사이 (이동 / 후보): 접혀 있다가 누르면 위아래로 벌어진다 */
+.gap { padding-bottom: 6px; }
 .route > .gap { padding-left: 0; }
+.route > .gap-move::before { background: repeating-linear-gradient(to bottom, var(--route) 0 5px, transparent 5px 9px); }
 .gap-toggle {
   position: relative; z-index: 1;
   display: flex; align-items: center; gap: 10px;
-  min-height: 44px; margin-left: 2px; padding: 0 14px 0 0;
+  min-height: 40px; margin-left: 2px; padding: 0 14px 0 0;
   border: 0; background: none; color: var(--text-2);
   font-size: 15px; font-weight: 600; cursor: pointer;
 }
@@ -373,6 +347,13 @@ button { font-family: inherit; }
   transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
 }
 .gap.open .gap-plus { transform: rotate(45deg); background: var(--route); color: #fff; }
+/* 이동: 노선 위의 작은 점 */
+.gap-dot {
+  width: 13px; height: 13px; margin: 0 6px; border-radius: 50%;
+  background: var(--page-bg); border: 3px solid var(--route);
+  transition: background 0.25s ease;
+}
+.gap.open .gap-dot { background: var(--route); }
 .gap.open .gap-toggle .chev { transform: rotate(225deg); }
 
 .gap-panel {
@@ -380,34 +361,56 @@ button { font-family: inherit; }
   margin-left: 38px;
   transition: grid-template-rows 0.3s ease;
 }
-.gap.open .gap-panel { grid-template-rows: 1fr; }
+.gap.open .gap-panel { grid-template-rows: 1fr; padding-bottom: 6px; }
 .gap-clip { min-height: 0; overflow: hidden; }
-.cands {
-  list-style: none; margin: 4px 0 0; padding: 4px 14px;
+.gap-box {
+  margin: 0; padding: 4px 14px;
   border-radius: 14px; background: #fff;
   border: 1px dashed #c5ccd6;
 }
-/* 후보가 많으면 이 목록만 따로 스크롤 — 끝에 닿아도 본문까지 밀리지 않게 */
-.cands.scroll {
-  max-height: 45dvh;
+/* 높이를 제한하고 이 영역만 따로 스크롤 — 끝에 닿아도 본문까지 밀리지 않게 */
+.gap-scroll {
+  max-height: min(34dvh, 240px);
   overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
 }
-.cands.scroll:not(.at-end) {
-  -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent);
-  mask-image: linear-gradient(to bottom, #000 82%, transparent);
+.gap-scroll:not(.at-end) {
+  -webkit-mask-image: linear-gradient(to bottom, #000 80%, transparent);
+  mask-image: linear-gradient(to bottom, #000 80%, transparent);
 }
+.cands { list-style: none; }
+.cands.gap-scroll { max-height: 45dvh; }
+
+/* 이동 흐름: 작은 점과 가는 선으로 이어지는 문장 */
+.flow { list-style: none; margin: 0; padding: 6px 0 8px; }
+.flow-step { position: relative; padding: 0 0 8px 18px; }
+.flow-step:last-child { padding-bottom: 0; }
+.flow-step::before {
+  content: ""; position: absolute; left: 0; top: 7px;
+  width: 8px; height: 8px; border-radius: 50%; background: var(--muted);
+}
+.flow-step:not(:last-child)::after {
+  content: ""; position: absolute; left: 3.5px; top: 17px; bottom: 1px;
+  width: 1px; background: #d9dce1;
+}
+.flow-step.mode-subway::before, .flow-step.mode-train::before { background: #1f3a5f; }
+.flow-step.mode-bus::before, .flow-step.mode-shuttle::before { background: #1b7a43; }
+.flow-step.mode-taxi::before { background: #c28a00; }
+.flow-step p { margin: 0; font-size: 15px; color: var(--text); }
+.flow-time { color: var(--primary); font-size: 14px; font-weight: 700; white-space: nowrap; }
+.flow-note { color: var(--muted); font-size: 14px !important; }
+
 .cand + .cand { border-top: 1px solid var(--line); }
 .cand-head {
-  width: 100%; min-height: 50px;
+  width: 100%; min-height: 46px;
   display: flex; align-items: center; gap: 10px;
-  padding: 8px 0; border: 0; background: none;
+  padding: 6px 0; border: 0; background: none;
   text-align: left; color: var(--text); cursor: pointer;
 }
 .cand-name { flex: 1; min-width: 0; font-size: 16px; font-weight: 600; }
 .cand-dist { flex: 0 0 auto; max-width: 45%; color: var(--muted); font-size: 14px; text-align: right; }
 .cand-head[aria-expanded="true"] .chev { transform: rotate(225deg); }
-.cand-body { padding: 0 0 12px; }
-.cand-body .desc { margin-top: 0; font-size: 15px; }
+.cand-body { padding: 0 0 10px; }
+.cand-body .desc { margin-top: 0; }
 
 /* 전환 효과: 누른 카드 → 상단 제목, 본문은 아래에서 올라온다 */
 .dv-body { view-transition-name: day-body; }

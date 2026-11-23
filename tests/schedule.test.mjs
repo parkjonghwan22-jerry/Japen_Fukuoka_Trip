@@ -7,7 +7,7 @@ import { routeHtml, SCROLL_FROM, MODES } from '../js/ui/route.js';
 const DAY_KEYS = new Set(['date', 'label', 'title', 'stay', 'stops']);
 const STOP_KEYS = new Set(['time', 'name', 'area', 'desc', 'reservation', 'reservationNote', 'fromStay', 'move', 'then']);
 const MOVE_KEYS = new Set(['total', 'steps']);
-const STEP_KEYS = new Set(['mode', 'from', 'to', 'time', 'note']);
+const STEP_KEYS = new Set(['mode', 'text', 'time', 'note']);
 const CAND_KEYS = new Set(['name', 'area', 'desc', 'reservation', 'reservationNote', 'fromStay']);
 
 // 손으로 입력한 일정 데이터의 실수(오타 난 항목 이름, 빠진 이름, 잘못된 값)를 찾는다
@@ -38,7 +38,7 @@ function problems(days, stays) {
           const tw = `${sw} 이동 ${ti + 1}단계`;
           for (const k of Object.keys(st)) if (!STEP_KEYS.has(k)) out.push(`${tw}: 모르는 항목 '${k}'`);
           if (!(st.mode in MODES)) out.push(`${tw}: mode '${st.mode}'는 ${Object.keys(MODES).join('/')} 중 하나`);
-          if (!st.from || !st.to) out.push(`${tw}: from/to가 비어 있음`);
+          if (typeof st.text !== 'string' || !st.text.trim()) out.push(`${tw}: text가 비어 있음`);
         });
       }
       (s.then ?? []).forEach((c, ci) => checkPlace(c, `${sw} 후보 ${ci + 1}(${c.name ?? '?'})`, CAND_KEYS));
@@ -68,10 +68,10 @@ test('검사기는 오타와 빠진 값을 잡는다', () => {
   const bad = [{ date: 'x', label: 'x', stay: 'nope', stops: [
     { name: '', resevation: 'done', time: '9:00', then: [{ name: 'A', reservation: 'yes' }] },
   ] }];
-  bad[0].stops.push({ name: 'B', move: { steps: [{ mode: 'car', from: 'A' }] } });
+  bad[0].stops.push({ name: 'B', move: { steps: [{ mode: 'car' }] } });
   const p = problems(bad, {});
   assert.ok(p.some((m) => m.includes("mode 'car'")));
-  assert.ok(p.some((m) => m.includes('from/to')));
+  assert.ok(p.some((m) => m.includes('text가 비어')));
   assert.ok(p.some((m) => m.includes("숙소 'nope'")));
   assert.ok(p.some((m) => m.includes("모르는 항목 'resevation'")));
   assert.ok(p.some((m) => m.includes('name이 비어')));
@@ -88,8 +88,8 @@ test('노선: 후보가 있는 일정 뒤에만 사이 구간이 생긴다', () 
 
 test(`노선: 후보가 ${SCROLL_FROM}곳 이상일 때만 목록에 따로 스크롤`, () => {
   const many = Array.from({ length: SCROLL_FROM }, (_, i) => ({ name: `c${i}` }));
-  assert.match(routeHtml([{ name: 'A', then: many }]), /class="cands scroll"/);
-  assert.match(routeHtml([{ name: 'A', then: many.slice(1) }]), /class="cands"/);
+  assert.match(routeHtml([{ name: 'A', then: many }]), /class="gap-box cands gap-scroll"/);
+  assert.match(routeHtml([{ name: 'A', then: many.slice(1) }]), /class="gap-box cands"/);
 });
 
 test('노선: 글자는 HTML로 해석되지 않는다', () => {
@@ -109,11 +109,12 @@ test('일정이 비어 있으면 안내 문구', () => {
 
 test('노선: 이동 카드는 일정 바로 뒤, 후보 구간보다 앞에 온다', () => {
   const html = routeHtml([
-    { name: 'A', move: { total: '약 30분', steps: [{ mode: 'subway', from: 'X역', to: 'Y역', time: '8분' }] }, then: [{ name: 'a1' }] },
+    { name: 'A', move: { total: '약 30분', steps: [{ mode: 'subway', text: '지하철로 Y역까지', time: '8분' }] }, then: [{ name: 'a1' }] },
     { name: 'B' },
   ]);
-  const order = [...html.matchAll(/class="(stop|move|gap)"/g)].map((m) => m[1]);
-  assert.deepEqual(order, ['stop', 'move', 'gap', 'stop']);
-  assert.match(html, /mode-subway">지하철/);
-  assert.match(html, /약 30분/);
+  const order = [...html.matchAll(/class="(stop|gap gap-move|gap)"/g)].map((m) => m[1]);
+  assert.deepEqual(order, ['stop', 'gap gap-move', 'gap', 'stop']);
+  assert.match(html, /flow-step mode-subway/);
+  assert.match(html, /이동 <b>약 30분<\/b>/);
+  assert.match(html, /gap-box gap-scroll"><ol class="flow"/); // 이동은 항상 높이 제한 + 스크롤
 });

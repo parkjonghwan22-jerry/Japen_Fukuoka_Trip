@@ -19,7 +19,7 @@
 //   }
 //
 // 이동 단계
-//   { mode: 'subway', from: '후쿠오카 공항역', to: '나카스카와바타역', time: '8~10분', note: '...' }
+//   { mode: 'subway', text: '지하철을 타고 나카스카와바타역까지', time: '8~10분', note: '...' }
 //   mode: walk 도보 | bus 버스 | shuttle 셔틀 | subway 지하철 | train 전철 | taxi 택시
 //
 // 후보: 핵심 일정과 같은 항목에서 time, then만 뺀 것

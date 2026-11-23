@@ -13,10 +13,10 @@ export default {
       move: {
         total: '약 30~40분',
         steps: [
-          { mode: 'shuttle', from: '국제선 터미널', to: '국내선 터미널', time: '10~15분', note: '무료 셔틀버스 · 배차 10~15분' },
-          { mode: 'walk', from: '국내선 터미널', to: '후쿠오카 공항역', time: '5~10분', note: '지하로 내려가면 지하철역' },
-          { mode: 'subway', from: '후쿠오카 공항역', to: '나카스카와바타역', time: '8~10분' },
-          { mode: 'walk', from: '나카스카와바타역', to: '라이블리 하카타점', time: '5분 안팎' },
+          { mode: 'shuttle', text: '국제선 터미널에서 무료 셔틀버스를 타고 국내선 터미널로', time: '10~15분', note: '배차 10~15분' },
+          { mode: 'walk', text: '지하로 내려가 후쿠오카 공항역까지 걸어서', time: '5~10분' },
+          { mode: 'subway', text: '지하철을 타고 나카스카와바타역까지', time: '8~10분' },
+          { mode: 'walk', text: '역에서 숙소까지 걸어서', time: '5분 안팎' },
         ],
       },
     },
