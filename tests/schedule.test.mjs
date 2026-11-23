@@ -3,9 +3,10 @@ import assert from 'node:assert/strict';
 import { DAYS, STAYS, RESERVATION } from '../js/schedule/index.js';
 import { DEMO_DAYS, DEMO_STAYS } from '../js/schedule/demo.js';
 import { routeHtml, SCROLL_FROM, MODES } from '../js/ui/route.js';
+import { THEN_LABELS } from '../js/ui/icons.js';
 
 const DAY_KEYS = new Set(['date', 'label', 'title', 'stay', 'stops']);
-const STOP_KEYS = new Set(['time', 'name', 'area', 'desc', 'reservation', 'reservationNote', 'move', 'then']);
+const STOP_KEYS = new Set(['time', 'name', 'area', 'desc', 'reservation', 'reservationNote', 'move', 'then', 'thenIcon']);
 const MOVE_KEYS = new Set(['distance', 'total', 'choose', 'steps']);
 const STEP_KEYS = new Set(['mode', 'title', 'text', 'time', 'note']);
 const CAND_KEYS = new Set(['name', 'area', 'desc', 'reservation', 'reservationNote', 'fromStay']);
@@ -31,6 +32,7 @@ function problems(days, stays) {
       checkPlace(s, sw, STOP_KEYS);
       if (s.time !== undefined && !/^([01]\d|2[0-3]):[0-5]\d$/.test(s.time)) out.push(`${sw}: time은 '09:30' 형식`);
       if (s.then !== undefined && !Array.isArray(s.then)) out.push(`${sw}: then은 목록이어야 함`);
+      if (s.thenIcon !== undefined && !(s.thenIcon in THEN_LABELS)) out.push(`${sw}: thenIcon '${s.thenIcon}'는 ${Object.keys(THEN_LABELS).join('/')} 중 하나`);
       if (s.move !== undefined) {
         for (const k of Object.keys(s.move)) if (!MOVE_KEYS.has(k)) out.push(`${sw} 이동: 모르는 항목 '${k}'`);
         if (!Array.isArray(s.move.steps) || !s.move.steps.length) out.push(`${sw} 이동: steps가 비어 있음`);
@@ -139,4 +141,17 @@ test('이동 접힌 줄: 거리 · 총 시간', () => {
   const html = routeHtml([{ name: 'A', move: { distance: '5.3km', total: '약 1시간', steps: [{ mode: 'walk' }] } }]);
   assert.match(html, /이동 <b>5\.3km · 약 1시간<\/b>/);
   assert.match(routeHtml([{ name: 'A', move: { steps: [{ mode: 'walk' }] } }]), /<span>이동<\/span>/);
+});
+
+test('후보 구간 아이콘: 0곳이어도 구간이 생기고 이름이 바뀐다', () => {
+  const html = routeHtml([{ name: 'A', thenIcon: 'food', then: [] }, { name: 'B' }]);
+  assert.match(html, /class="gap"/);
+  assert.match(html, /gap-icon"><svg/);
+  assert.match(html, /먹을 곳 <span class="gap-none">· 아직 없음/);
+  assert.match(html, /아직 후보가 없습니다/);
+  assert.match(routeHtml([{ name: 'A', thenIcon: 'food', then: [{ name: 'x' }] }]), /먹을 곳 <b>1<\/b>곳/);
+});
+
+test('이동 구간은 자동차 아이콘', () => {
+  assert.match(routeHtml([{ name: 'A', move: { steps: [{ mode: 'walk' }] } }]), /gap-move[\s\S]*gap-icon"><svg/);
 });

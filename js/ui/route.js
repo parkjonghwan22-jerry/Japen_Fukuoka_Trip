@@ -1,6 +1,7 @@
 // 일차 상세의 노선(핵심 일정 점 + 점 사이 후보 목록)을 HTML 문자열로 만든다. DOM 없이 테스트할 수 있다.
 import { esc } from './dom.js';
 import { RESERVATION } from '../schedule/index.js';
+import { ICONS, THEN_LABELS } from './icons.js';
 
 // 후보가 이 개수 이상이면 후보 목록에 따로 스크롤을 준다
 export const SCROLL_FROM = 5;
@@ -58,7 +59,7 @@ function moveHtml(m, gi) {
   return `
     <li class="gap gap-move">
       <button type="button" class="gap-toggle" aria-expanded="false" aria-controls="${id}">
-        <span class="gap-dot" aria-hidden="true"></span>
+        <span class="gap-icon">${ICONS.car}</span>
         <span>이동${[m.distance, m.total].some(Boolean) ? ` <b>${[m.distance, m.total].filter(Boolean).map(esc).join(' · ')}</b>` : ''}</span>
         <span class="chev" aria-hidden="true"></span>
       </button>
@@ -85,20 +86,29 @@ function candHtml(c, id) {
     </li>`;
 }
 
-function gapHtml(list, gi) {
+// 후보 구간. icon(food/cafe/shop/sight)을 정하면 원 안에 그 아이콘과 이름이 보이고, 후보가 0곳이어도 구간이 생긴다.
+function gapHtml(list, gi, icon) {
   const id = `gap-${gi}`;
+  const mark = ICONS[icon] && THEN_LABELS[icon]
+    ? `<span class="gap-icon">${ICONS[icon]}</span>`
+    : '<span class="gap-plus" aria-hidden="true">+</span>';
+  const name = THEN_LABELS[icon] ?? '이 사이 후보';
+  const count = list.length ? ` <b>${list.length}</b>곳` : ' <span class="gap-none">· 아직 없음</span>';
+  const body = list.length
+    ? `<ul class="gap-box cands${list.length >= SCROLL_FROM ? ' gap-scroll' : ''}">
+            ${list.map((c, ci) => candHtml(c, `${id}-${ci}`)).join('')}
+          </ul>`
+    : '<p class="gap-box gap-empty">아직 후보가 없습니다</p>';
   return `
     <li class="gap">
       <button type="button" class="gap-toggle" aria-expanded="false" aria-controls="${id}">
-        <span class="gap-plus" aria-hidden="true">+</span>
-        <span>이 사이 후보 <b>${list.length}</b>곳</span>
+        ${mark}
+        <span>${name}${count}</span>
         <span class="chev" aria-hidden="true"></span>
       </button>
       <div class="gap-panel" id="${id}">
         <div class="gap-clip">
-          <ul class="gap-box cands${list.length >= SCROLL_FROM ? ' gap-scroll' : ''}">
-            ${list.map((c, ci) => candHtml(c, `${id}-${ci}`)).join('')}
-          </ul>
+          ${body}
         </div>
       </div>
     </li>`;
@@ -110,7 +120,8 @@ export function routeHtml(stops) {
   stops.forEach((s, i) => {
     parts.push(stopHtml(s));
     if (s.move?.steps?.length) parts.push(moveHtml(s.move, i));
-    if (Array.isArray(s.then) && s.then.length) parts.push(gapHtml(s.then, i));
+    const then = Array.isArray(s.then) ? s.then : [];
+    if (then.length || THEN_LABELS[s.thenIcon]) parts.push(gapHtml(then, i, s.thenIcon));
   });
   return `<ol class="route">${parts.join('')}</ol>`;
 }

@@ -347,13 +347,17 @@ button { font-family: inherit; }
   transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
 }
 .gap.open .gap-plus { transform: rotate(45deg); background: var(--route); color: #fff; }
-/* 이동: 노선 위의 작은 점 */
-.gap-dot {
-  width: 13px; height: 13px; margin: 0 6px; border-radius: 50%;
-  background: var(--page-bg); border: 3px solid var(--route);
-  transition: background 0.25s ease;
+/* 노선 위 작은 원 아이콘 (이동: 자동차, 후보: 음식 등) */
+.gap-icon {
+  width: 25px; height: 25px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--page-bg); border: 2px solid var(--route); color: var(--route);
+  transition: background 0.25s ease, color 0.25s ease;
 }
-.gap.open .gap-dot { background: var(--route); }
+.gap-icon svg { display: block; }
+.gap.open .gap-icon { background: var(--route); color: #fff; }
+.gap-none { color: var(--muted); font-weight: 500; }
+.gap-empty { padding: 12px 14px; color: var(--muted); font-size: 15px; }
 .gap.open .gap-toggle .chev { transform: rotate(225deg); }
 
 .gap-panel {
@@ -438,5 +442,5 @@ button { font-family: inherit; }
 .dv.dv-enter .dv-body { animation: dv-rise 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
 @keyframes dv-fade { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
-  .gap-panel, .gap-plus, .chev { transition: none; }
+  .gap-panel, .gap-plus, .gap-icon, .chev { transition: none; }
 }
